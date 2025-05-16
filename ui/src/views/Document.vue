@@ -2,7 +2,7 @@
 import { computed, onMounted, watch, ref, onUnmounted, nextTick, type Directive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDocumentStore } from '../stores/document';
-import { useEditor, EditorContent, VueNodeViewRenderer } from '@tiptap/vue-3';
+import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Color } from "@tiptap/extension-color";
@@ -168,7 +168,7 @@ const updateTitle = async () => {
     
     try {
       // Make sure to explicitly send the current content with the title update
-      const updatedDoc = await documentStore.updateDocument({
+      await documentStore.updateDocument({
         id: currentDocument.value.id,
         name: editableTitle.value,
         content: currentContent, // Explicitly include the content
