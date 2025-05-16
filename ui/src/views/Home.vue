@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
 
 const greeting = ref(`Good ${getTimeOfDay()}, ${getUserFirstName()}`)
 
@@ -12,8 +11,7 @@ function getTimeOfDay() {
 }
 
 function getUserFirstName() {
-  const email = useAuthStore().user?.email
-  return email ? email.split('@')[0] : 'User'
+
 }
 </script>
 
