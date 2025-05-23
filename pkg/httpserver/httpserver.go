@@ -7,6 +7,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/labbs/mynotes/internal/logger/zerolog"
 	apiRouter "github.com/labbs/mynotes/pkg/api/router"
+	appRouter "github.com/labbs/mynotes/pkg/app/router"
 	z "github.com/rs/zerolog"
 	"gorm.io/gorm"
 
@@ -62,7 +63,13 @@ func (s *Config) NewServer() error {
 		Db:     s.Db,
 	}
 
+	apprc := appRouter.Config{
+		Fiber:  s.Fiber,
+		Logger: s.Logger,
+	}
+
 	apirc.Setup()
+	apprc.Setup()
 
 	go func() {
 		for {
