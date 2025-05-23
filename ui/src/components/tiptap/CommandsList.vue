@@ -28,13 +28,23 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick } from "vue";
 
+interface CommandItem {
+  name: string;
+  description: string;
+  icon: any;
+}
+
 const props = defineProps({
   items: {
-    type: Array,
+    type: Array as () => CommandItem[],
     required: true
   },
   editor: {
     type: Object,
+    required: true
+  },
+  command: {
+    type: Function as unknown as () => (item: CommandItem) => void,
     required: true
   }
 });
