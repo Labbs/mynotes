@@ -14,9 +14,9 @@ const spaceStore = useSpaceStore();
 const sidebarStore = useSidebarStore();
 const authStore = useAuthStore();
 
-const props = defineProps<{
-  spaceId?: string;
-}>();
+// const { spaceId } = defineProps<{
+//   spaceId?: string;
+// }>();
 
 onMounted(() => {
   spaceStore.fetchSpaces();
@@ -32,7 +32,7 @@ const sidebarWidth = computed(() => {
   return { width: `${sidebarStore.width}px` };
 });
 
-function startResize(event: MouseEvent) {
+function startResize(_event: MouseEvent) {
   isResizing.value = true;
   document.body.classList.add("resizing");
   document.addEventListener("mousemove", handleResize);
