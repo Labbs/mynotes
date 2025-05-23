@@ -1,5 +1,4 @@
 import { VueRenderer } from "@tiptap/vue-3";
-import tippy, { type Instance as TippyInstance } from "tippy.js";
 import { Editor, type Range } from "@tiptap/core";
 import CommandsList from "../components/tiptap/CommandsList.vue";
 import {
@@ -144,7 +143,7 @@ export const suggestion = {
 
   render: () => {
     let component: VueRenderer;
-    let popup: TippyInstance[];
+    let popupElement: HTMLElement | null = null;
 
     return {
       onStart: (props: SuggestionProps) => {
@@ -157,44 +156,90 @@ export const suggestion = {
           return;
         }
 
-        popup = tippy("body", {
-          getReferenceClientRect: props.clientRect,
-          appendTo: () => document.body,
-          content: component.element,
-          showOnCreate: true,
-          interactive: true,
-          trigger: "manual",
-          placement: "bottom-start",
+        // Create our own popup element
+        popupElement = document.createElement('div');
+        popupElement.className = 'suggestion-popup';
+        
+        // Style the popup to match tippy's behavior
+        Object.assign(popupElement.style, {
+          position: 'absolute',
+          zIndex: '9999',
+          backgroundColor: 'white',
+          borderRadius: '4px',
+          boxShadow: '0 0 0 1px rgba(0,0,0,.05), 0 4px 8px rgba(0,0,0,.1)',
+          maxWidth: '400px',
+          maxHeight: '400px',
+          overflow: 'auto'
         });
+        
+        // Add the component element to our popup
+        if (component.element) {
+          popupElement.appendChild(component.element);
+        }
+        document.body.appendChild(popupElement);
+        
+        // Position the popup using the clientRect
+        const rect = props.clientRect();
+        updatePopupPosition(popupElement, rect);
       },
 
       onUpdate(props: SuggestionProps) {
-        component.updateProps(props);
+        component?.updateProps(props);
 
-        if (!props.clientRect) {
+        if (!props.clientRect || !popupElement) {
           return;
         }
 
-        popup[0].setProps({
-          getReferenceClientRect: props.clientRect,
-        });
+        // Update the position of our popup
+        const rect = props.clientRect();
+        updatePopupPosition(popupElement, rect);
       },
 
       onKeyDown(props: { event: KeyboardEvent }) {
         if (props.event.key === "Escape") {
-          popup[0].hide();
+          if (popupElement && popupElement.parentElement) {
+            popupElement.parentElement.removeChild(popupElement);
+            popupElement = null;
+          }
           return true;
         }
 
-        return component.ref?.onKeyDown(props.event);
+        return component?.ref?.onKeyDown(props.event);
       },
 
       onExit() {
-        popup[0].destroy();
-        component.destroy();
+        if (popupElement && popupElement.parentElement) {
+          popupElement.parentElement.removeChild(popupElement);
+          popupElement = null;
+        }
+        
+        if (component) {
+          component.destroy();
+        }
       },
     };
   },
 };
+
+// Helper function to position the popup
+function updatePopupPosition(element: HTMLElement, rect: DOMRect) {
+  // Position below the cursor
+  element.style.top = `${rect.bottom + window.scrollY}px`;
+  element.style.left = `${rect.left + window.scrollX}px`;
+  
+  // Ensure the popup doesn't go out of the viewport
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const popupRect = element.getBoundingClientRect();
+  
+  if (rect.left + popupRect.width > viewportWidth) {
+    element.style.left = `${viewportWidth - popupRect.width - 10}px`;
+  }
+  
+  if (rect.bottom + popupRect.height > viewportHeight) {
+    // Show above if not enough space below
+    element.style.top = `${rect.top - popupRect.height + window.scrollY}px`;
+  }
+}
 
 export default suggestion;
