@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { BubbleMenu } from '@tiptap/vue-3';
+import type { Editor } from '@tiptap/core';
+import '@tiptap/extension-underline';
 import {
   BoldIcon,
   ItalicIcon,
@@ -24,7 +26,7 @@ import type { EditorView } from "@tiptap/pm/view";
 // Définir les props du composant
 const props = defineProps({
   editor: {
-    type: Object,
+    type: Object as () => Editor,
     required: true
   }
 });
@@ -228,13 +230,8 @@ const isBackgroundColorActive = (color: string) => {
 
 <template>
   <BubbleMenu
-    v-if="editor"
-    :editor="editor"
-    :tippy-options="{ 
-      duration: 100,
-      placement: 'top',
-      hideOnClick: false // Empêcher la fermeture automatique
-    }"
+    v-if="props.editor"
+    :editor="props.editor"
     :should-show="shouldShow"
     class="flex flex-col bg-white rounded-md shadow-md p-1"
   >
@@ -258,7 +255,7 @@ const isBackgroundColorActive = (color: string) => {
             :key="type.name + (type.attrs ? JSON.stringify(type.attrs) : '')"
             @click="setContentType(type.command)"
             :class="{
-              'bg-gray-100/80': editor.isActive(type.name, type.attrs),
+              'bg-gray-100/80': props.editor.isActive(type.name, type.attrs),
             }"
             class="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100/80 rounded"
           >
@@ -277,7 +274,7 @@ const isBackgroundColorActive = (color: string) => {
           :key="action.name"
           @click="action.command()"
           :class="{
-            'bg-gray-100/80 text-primary': editor.isActive(action.name),
+            'bg-gray-100/80 text-primary': props.editor.isActive(action.name),
           }"
           :title="action.label"
           class="rounded hover:bg-gray-100/80 w-8 h-8 grid place-items-center"
