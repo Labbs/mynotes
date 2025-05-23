@@ -1,0 +1,16 @@
+{
+  "dev-mode": true,
+  "logger": {
+    "level": "debug",
+    "pretty": true
+  },
+  "http": {
+    "port": 8080,
+    "http_logs": true
+  },
+  "session": {
+    "secret": "mynotes_session",
+    "cookie-name": "mynotes_session",
+    "cookie-max-age": 86400
+  }
+}
