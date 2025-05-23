@@ -1,10 +1,10 @@
 package router
 
 import (
-	"github.com/labbs/mynotion/pkg/api/controller"
-	"github.com/labbs/mynotion/pkg/api/middleware"
-	"github.com/labbs/mynotion/pkg/repository"
-	"github.com/labbs/mynotion/pkg/service"
+	"github.com/labbs/mynotes/pkg/api/controller"
+	"github.com/labbs/mynotes/pkg/api/middleware"
+	"github.com/labbs/mynotes/pkg/repository"
+	"github.com/labbs/mynotes/pkg/service"
 )
 
 func NewAuthRouter(config *Config) {

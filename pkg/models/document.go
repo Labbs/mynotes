@@ -7,7 +7,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gosimple/slug"
-	"github.com/labbs/mynotion/internal/shortuuid"
+	"github.com/labbs/mynotes/internal/shortuuid"
 	"gorm.io/gorm"
 )
 

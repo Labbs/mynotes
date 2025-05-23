@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/labbs/mynotion/pkg/models"
+	"github.com/labbs/mynotes/pkg/models"
 	"github.com/rs/zerolog"
 )
 

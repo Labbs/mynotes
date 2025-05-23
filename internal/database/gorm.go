@@ -1,7 +1,7 @@
 package database
 
 import (
-	zerologadapter "github.com/labbs/mynotion/internal/logger/zerolog"
+	zerologadapter "github.com/labbs/mynotes/internal/logger/zerolog"
 	"github.com/rs/zerolog"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"

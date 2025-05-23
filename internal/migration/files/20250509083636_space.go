@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/labbs/mynotion/pkg/config"
+	"github.com/labbs/mynotes/pkg/config"
 	"github.com/pressly/goose/v3"
 )
 

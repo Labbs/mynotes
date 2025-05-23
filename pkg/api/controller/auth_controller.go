@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotion/pkg/models"
+	"github.com/labbs/mynotes/pkg/models"
 	"github.com/rs/zerolog"
 )
 

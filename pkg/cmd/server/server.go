@@ -5,11 +5,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/labbs/mynotion/internal/database"
-	"github.com/labbs/mynotion/pkg/config"
-	"github.com/labbs/mynotion/pkg/flags"
-	htserver "github.com/labbs/mynotion/pkg/httpserver"
-	logger "github.com/labbs/mynotion/pkg/logger"
+	"github.com/labbs/mynotes/internal/database"
+	"github.com/labbs/mynotes/pkg/config"
+	"github.com/labbs/mynotes/pkg/flags"
+	htserver "github.com/labbs/mynotes/pkg/httpserver"
+	logger "github.com/labbs/mynotes/pkg/logger"
 
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"

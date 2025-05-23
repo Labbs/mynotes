@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/goccy/go-json"
-	"github.com/labbs/mynotion/internal/logger/zerolog"
-	apiRouter "github.com/labbs/mynotion/pkg/api/router"
+	"github.com/labbs/mynotes/internal/logger/zerolog"
+	apiRouter "github.com/labbs/mynotes/pkg/api/router"
 	z "github.com/rs/zerolog"
 	"gorm.io/gorm"
 

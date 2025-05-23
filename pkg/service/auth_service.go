@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/gofiber/fiber/v2/utils"
-	"github.com/labbs/mynotion/internal/tokenutil"
-	"github.com/labbs/mynotion/pkg/models"
+	"github.com/labbs/mynotes/internal/tokenutil"
+	"github.com/labbs/mynotes/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

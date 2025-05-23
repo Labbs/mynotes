@@ -3,13 +3,13 @@ package migration
 import (
 	"errors"
 
-	"github.com/labbs/mynotion/internal/database"
-	"github.com/labbs/mynotion/internal/migration"
-	"github.com/labbs/mynotion/pkg/config"
-	logger "github.com/labbs/mynotion/pkg/logger"
+	"github.com/labbs/mynotes/internal/database"
+	"github.com/labbs/mynotes/internal/migration"
+	"github.com/labbs/mynotes/pkg/config"
+	logger "github.com/labbs/mynotes/pkg/logger"
 	"gorm.io/gorm"
 
-	"github.com/labbs/mynotion/pkg/flags"
+	"github.com/labbs/mynotes/pkg/flags"
 
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"

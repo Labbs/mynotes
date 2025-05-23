@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 
-	"github.com/labbs/mynotion/pkg/models"
+	"github.com/labbs/mynotes/pkg/models"
 	"gorm.io/gorm"
 )
 

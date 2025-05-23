@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/labbs/mynotion/pkg/config"
-	"github.com/labbs/mynotion/pkg/models"
+	"github.com/labbs/mynotes/pkg/config"
+	"github.com/labbs/mynotes/pkg/models"
 )
 
 func CreateAccessToken(user_id, sessionId string) (accessToken string, err error) {

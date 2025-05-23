@@ -1,7 +1,7 @@
 package flags
 
 import (
-	"github.com/labbs/mynotion/pkg/config"
+	"github.com/labbs/mynotes/pkg/config"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 )

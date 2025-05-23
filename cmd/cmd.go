@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/labbs/mynotion/pkg/cmd/migration"
-	"github.com/labbs/mynotion/pkg/cmd/server"
+	"github.com/labbs/mynotes/pkg/cmd/migration"
+	"github.com/labbs/mynotes/pkg/cmd/server"
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,7 +13,7 @@ var version = "development"
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "MyNotion"
+	app.Name = "MyNotes"
 	app.Usage = ""
 	app.Version = version
 

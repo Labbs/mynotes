@@ -1,6 +1,6 @@
 package service
 
-import "github.com/labbs/mynotion/pkg/models"
+import "github.com/labbs/mynotes/pkg/models"
 
 type documentService struct {
 	documentRepository models.DocumentRepository
