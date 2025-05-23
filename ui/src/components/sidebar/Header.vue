@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const props = defineProps<{
-  isCollapsed: boolean;
-  isHovered: boolean;
-}>();
+const { isCollapsed, isHovered } = defineProps<{
+  isCollapsed: boolean,
+  isHovered: boolean
+}>()
 </script>
 
 <template>
