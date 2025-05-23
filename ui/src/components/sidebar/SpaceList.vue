@@ -4,7 +4,8 @@ import { useSpaceStore } from '../../stores/space'
 import { useDocumentStore } from '../../stores/document'
 import { useRouter, useRoute } from 'vue-router'
 
-const props = defineProps<{
+// Use defineProps without assigning to a variable
+const { isCollapsed, isHovered } = defineProps<{
   isCollapsed: boolean,
   isHovered: boolean
 }>()
@@ -19,7 +20,7 @@ const currentSlug = computed(() => route.params.slug as string)
 // Chargement des espaces développés depuis le localStorage
 const loadExpandedSpaces = () => {
   try {
-    const savedExpandedSpaces = localStorage.getItem('mynotion_expanded_spaces')
+    const savedExpandedSpaces = localStorage.getItem('mynotes_expanded_spaces')
     if (savedExpandedSpaces) {
       expandedSpaces.value = new Set(JSON.parse(savedExpandedSpaces))
     }
@@ -32,7 +33,7 @@ const loadExpandedSpaces = () => {
 const saveExpandedSpaces = () => {
   try {
     localStorage.setItem(
-      'mynotion_expanded_spaces',
+      'mynotes_expanded_spaces',
       JSON.stringify([...expandedSpaces.value])
     )
   } catch (err) {
@@ -83,6 +84,7 @@ const createDocument = async (spaceId: string) => {
 
 const showSpaceMenu = (spaceId: string) => {
   // TODO: Implement space menu
+  console.log('Space menu clicked for space:', spaceId)
 }
 
 onMounted(async () => {
