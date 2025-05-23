@@ -9,8 +9,8 @@
     "http_logs": true
   },
   "session": {
-    "secret": "mynotion_session",
-    "cookie-name": "mynotion_session",
+    "secret": "mynotes_session",
+    "cookie-name": "mynotes_session",
     "cookie-max-age": 86400
   }
 }
