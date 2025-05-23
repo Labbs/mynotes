@@ -3,10 +3,10 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { HomeIcon, Cog6ToothIcon } from "@heroicons/vue/24/outline";
 
-const props = defineProps<{
-  isCollapsed: boolean;
-  isHovered: boolean;
-}>();
+const { isCollapsed, isHovered } = defineProps<{
+  isCollapsed: boolean,
+  isHovered: boolean
+}>()
 
 const router = useRouter();
 
