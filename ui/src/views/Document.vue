@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useDocumentStore } from '../stores/document';
 import { useFavoriteStore } from '../stores/favorite';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
+import Header from '../components/document/Header.vue';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Color } from "@tiptap/extension-color";
@@ -16,7 +17,7 @@ import suggestion from '../extensions/Suggestion';
 import Highlight from '@tiptap/extension-highlight';
 
 const route = useRoute()
-const documentStore = useDocumentStore()
+const documentStore = useDocumentStore();
 const favoritesStore = useFavoriteStore();
 const currentDocument = computed(() => documentStore.currentDocument)
 const isEditingTitle = ref(false)
@@ -25,6 +26,38 @@ const saveTimeout = ref<number | null>(null)
 const isEditing = ref(false)
 const editorInitialized = ref(false)
 const isEditorUpdating = ref(false)
+const headerIconSidebarVisible = ref(false) // Pour suivre l'état de visibilité de la sidebar d'icônes
+
+// Function to update document icon
+const updateDocumentIcon = async (icon: string) => {
+  console.log('updateDocumentIcon called with:', icon);
+  if (!currentDocument.value) return;
+  
+  currentDocument.value.config.icon = icon;
+  console.log('Current document before update:', currentDocument.value);
+  
+  try {
+    await documentStore.updateDocument({
+      id: currentDocument.value.id,
+      name: currentDocument.value.name,
+      content: currentDocument.value.content,
+      space_id: currentDocument.value.space_id,
+      config: currentDocument.value.config
+    });
+    await favoritesStore.fetchFavorites(); // Refresh favorites after update
+    console.log('Document icon updated successfully');
+  } catch (error) {
+    console.error('Failed to update document icon:', error);
+  }
+};
+
+// Function to toggle editor editable state
+const toggleEditorEditable = (editable: boolean) => {
+  if (editor.value) {
+    console.log('Setting editor editable state to:', editable);
+    editor.value.setEditable(editable);
+  }
+};
 
 const editor = useEditor({
   content: '<p></p>', // Start with empty content
@@ -185,7 +218,8 @@ const updateTitle = async () => {
         id: currentDocument.value.id,
         name: editableTitle.value,
         content: currentContent, // Explicitly include the content
-        space_id: currentDocument.value.space_id
+        space_id: currentDocument.value.space_id,
+        config: currentDocument.value.config
       });
       
       isEditingTitle.value = false;
@@ -204,6 +238,8 @@ const updateTitle = async () => {
         if (editor.value && currentContent) {
           editor.value.commands.setContent(currentContent);
         }
+
+        await favoritesStore.fetchFavorites();
       }
       
       console.log('Document title updated successfully, content preserved');
@@ -232,7 +268,8 @@ const saveContent = async () => {
         id: currentDocument.value.id,
         name: currentDocument.value.name,
         content: currentDocument.value.content,
-        space_id: currentDocument.value.space_id
+        space_id: currentDocument.value.space_id,
+        config: currentDocument.value.config
       });
       
       console.log('Content auto-saved');
@@ -251,15 +288,10 @@ onUnmounted(() => {
   }
   editor.value?.destroy();
 });
-
-// Directive focus
-const vFocus: Directive = {
-  mounted: (el) => el.focus()
-}
 </script>
 
 <template>
-  <main class="flex-1 overflow-y-auto">
+  <main class="flex-1 overflow-y-auto relative">
     <!-- Afficher un indicateur de chargement -->
     <div v-if="documentStore.loadingDocument" class="flex justify-center items-center h-screen">
       <div class="animate-pulse text-xl text-gray-500">Loading the document</div>
@@ -267,39 +299,32 @@ const vFocus: Directive = {
     
     <!-- Afficher le contenu une fois chargé -->
     <template v-else-if="currentDocument">
-      <div class="sticky top-0 border-b border-e bg-white">
-        <div class="flex justify-between items-center h-16 px-8">
-          <div class="flex-1" />
-          <div v-if="isEditingTitle" class="flex-1">
-            <input v-model="editableTitle" type="text" class="w-full text-2xl font-medium text-gray-600 bg-transparent focus:outline-none text-center" @blur="updateTitle" @keyup.enter="($event.target as HTMLInputElement).blur()" v-focus />
+      <div class="flex relative h-full">
+        <div 
+          :class="{ 'mr-72': headerIconSidebarVisible }" 
+          class="transition-all duration-300 ease-in-out w-full"
+        >
+          <Header 
+            :current-document="currentDocument" 
+            :is-editing-title="isEditingTitle" 
+            :editable-title="editableTitle"
+            @update-title="updateTitle"
+            @favorite="favorite"
+            @update:is-editing-title="isEditingTitle = $event"
+            @update:editable-title="editableTitle = $event"
+            @setDocumentIcon="updateDocumentIcon"
+            @toggleEditorEditable="toggleEditorEditable"
+            @iconSidebarVisibility="headerIconSidebarVisible = $event"
+          />
+          
+          <!-- This is where the editor should be rendered -->
+          <div class="editor-container px-8 py-4">
+            <editor-content v-if="editor" :editor="editor" class="prose max-w-none" />
+            <BubbleMenu :editor="editor" v-if="editor" />
+            <div v-else class="min-h-[300px] border rounded p-4 flex items-center justify-center text-gray-400">
+              Loading editor...
+            </div>
           </div>
-          <h1 
-            v-else 
-            class="text-2xl font-medium text-gray-600 flex-1 text-center cursor-text"
-            @click="isEditingTitle = true"
-          >
-            {{ currentDocument.name }}
-          </h1>
-          <div class="flex-1 flex items-center justify-end gap-2">
-            <button class="text-gray-400 hover:text-yellow-500 transition-colors p-2 rounded-lg hover:bg-gray-100"
-              @click="favorite"
-              :class="{
-                'text-yellow-500': favoritesStore.favorites.some(f => f.document?.id === currentDocument?.id)
-              }">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- This is where the editor should be rendered -->
-      <div class="editor-container px-8 py-4">
-        <editor-content v-if="editor" :editor="editor" class="prose max-w-none" />
-        <BubbleMenu :editor="editor" v-if="editor" />
-        <div v-else class="min-h-[300px] border rounded p-4 flex items-center justify-center text-gray-400">
-          Loading editor...
         </div>
       </div>
     </template>
