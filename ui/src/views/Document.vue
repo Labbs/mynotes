@@ -2,6 +2,7 @@
 import { computed, onMounted, watch, ref, onUnmounted, nextTick, type Directive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDocumentStore } from '../stores/document';
+import { useFavoriteStore } from '../stores/favorite';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -16,6 +17,7 @@ import Highlight from '@tiptap/extension-highlight';
 
 const route = useRoute()
 const documentStore = useDocumentStore()
+const favoritesStore = useFavoriteStore();
 const currentDocument = computed(() => documentStore.currentDocument)
 const isEditingTitle = ref(false)
 const editableTitle = ref('')
@@ -94,6 +96,17 @@ watch(() => documentStore.loadingDocument, (isLoading) => {
     });
   }
 });
+
+const favorite = async () => {
+  // check if the document is already in favorites
+  if (favoritesStore.favorites.some(f => f.document?.id === currentDocument.value?.id)) {
+    // remove from favorites
+    await favoritesStore.unFavorite(currentDocument.value?.id as string);
+  } else {
+    // add to favorites
+    await favoritesStore.addFavorite(currentDocument.value?.id as string);
+  }
+}
 
 // Improve the updateEditorFromDocument function
 const updateEditorFromDocument = () => {
@@ -249,13 +262,14 @@ const vFocus: Directive = {
   <main class="flex-1 overflow-y-auto">
     <!-- Afficher un indicateur de chargement -->
     <div v-if="documentStore.loadingDocument" class="flex justify-center items-center h-screen">
-      <div class="animate-pulse text-xl text-gray-500">Chargement du document...</div>
+      <div class="animate-pulse text-xl text-gray-500">Loading the document</div>
     </div>
     
     <!-- Afficher le contenu une fois chargé -->
     <template v-else-if="currentDocument">
       <div class="sticky top-0 border-b border-e bg-white">
         <div class="flex justify-between items-center h-16 px-8">
+          <div class="flex-1" />
           <div v-if="isEditingTitle" class="flex-1">
             <input v-model="editableTitle" type="text" class="w-full text-2xl font-medium text-gray-600 bg-transparent focus:outline-none text-center" @blur="updateTitle" @keyup.enter="($event.target as HTMLInputElement).blur()" v-focus />
           </div>
@@ -266,6 +280,17 @@ const vFocus: Directive = {
           >
             {{ currentDocument.name }}
           </h1>
+          <div class="flex-1 flex items-center justify-end gap-2">
+            <button class="text-gray-400 hover:text-yellow-500 transition-colors p-2 rounded-lg hover:bg-gray-100"
+              @click="favorite"
+              :class="{
+                'text-yellow-500': favoritesStore.favorites.some(f => f.document?.id === currentDocument?.id)
+              }">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
       
@@ -281,7 +306,7 @@ const vFocus: Directive = {
     
     <!-- Message si aucun document n'est trouvé -->
     <div v-else class="flex justify-center items-center h-screen">
-      <div class="text-xl text-gray-500">Document non trouvé</div>
+      <div class="text-xl text-gray-500">Document not found</div>
     </div>
   </main>
 </template>
