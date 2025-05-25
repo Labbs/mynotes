@@ -2,11 +2,10 @@
 import { onMounted } from 'vue';
 import { useFavoriteStore } from "../../stores/favorite";
 
-// Use defineProps without assigning to a variable
-// const { isCollapsed, isHovered } = defineProps<{
-//   isCollapsed: boolean,
-//   isHovered: boolean
-// }>()
+const { isCollapsed, isHovered } = defineProps<{
+  isCollapsed: boolean,
+  isHovered: boolean
+}>()
 
 const favoritesStore = useFavoriteStore();
 
@@ -26,11 +25,12 @@ onMounted(async() => {
       v-for="favorite in favoritesStore.favorites"
       :key="favorite.id"
       :to="`/d/${favorite.document?.slug || ''}`"
-      class="flex items-center gap-x-2 rounded-lg px-2 py-1 text-[13px] text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+      class="flex items-center gap-x-2 rounded-lg px-2 py-1 text-[13px] text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+      :class="{'justify-center': isCollapsed && !isHovered}">
       <div class="size-4 rounded bg-gray-100 flex items-center justify-center opacity-75 text-xs font-medium">
         {{ favorite.document?.name[0]?.toUpperCase() }}
       </div>
-      <span>{{ capitalizeFirst(favorite.document?.name) }}</span>
+      <span v-show="!isCollapsed || isHovered" class="flex-grow text-left">{{ capitalizeFirst(favorite.document?.name) }}</span>
     </router-link>
   </div>
 </template>
