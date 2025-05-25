@@ -11,9 +11,9 @@ const { isCollapsed, isHovered } = defineProps<{
       <div
         class="size-5 rounded-lg bg-gray-100 flex items-center justify-center"
       >
-        <span class="font-medium">L</span>
+        <span class="font-medium"></span>
       </div>
-      <span v-show="!isCollapsed || isHovered" class="font-medium">Labbs</span>
+      <span v-show="!isCollapsed || isHovered" class="font-medium">My Notes</span>
     </router-link>
   </div>
 </template>
