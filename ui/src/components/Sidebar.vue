@@ -4,22 +4,22 @@ import { useRouter } from "vue-router";
 import { useSpaceStore } from "../stores/space";
 import { useSidebarStore } from "../stores/sidebar";
 import { useAuthStore } from "../stores/auth";
+import { useFavoriteStore } from "../stores/favorite";
 
 import Header from "./sidebar/Header.vue";
 import CommonMenu from "./sidebar/CommonMenu.vue";
 import SpaceList from "./sidebar/SpaceList.vue";
+import FavoritesList from "./sidebar/FavoritesList.vue";
 
 const router = useRouter();
 const spaceStore = useSpaceStore();
 const sidebarStore = useSidebarStore();
 const authStore = useAuthStore();
-
-// const { spaceId } = defineProps<{
-//   spaceId?: string;
-// }>();
+const favoritesStore = useFavoriteStore();
 
 onMounted(() => {
   spaceStore.fetchSpaces();
+  favoritesStore.fetchFavorites();
 });
 
 const isHovered = ref(false);
@@ -113,6 +113,15 @@ const handleLogout = () => {
         <div class="border-t border-gray-100">
           <div class="px-2">
             <CommonMenu
+              :isCollapsed="sidebarStore.isCollapsed"
+              :isHovered="isHovered"
+            />
+          </div>
+        </div>
+
+        <div class="border-t border-gray-100" v-if="favoritesStore.favorites.length">
+          <div class="px-2">
+            <FavoritesList
               :isCollapsed="sidebarStore.isCollapsed"
               :isHovered="isHovered"
             />
