@@ -7,7 +7,12 @@ export default {
     './src/components/**/*.{vue,js,ts,jsx,tsx}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      zIndex: {
+        '100': '100',
+        '110': '110',
+      }
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),
