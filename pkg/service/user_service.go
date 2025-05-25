@@ -36,10 +36,6 @@ func (s *userService) Delete(id string) error {
 	return s.userRepository.Delete(id)
 }
 
-func (s *userService) GetOrderedFavorites(userId string) ([]models.Favorite, error) {
-	return s.userRepository.GetOrderedFavorites(userId)
-}
-
 func (s *userService) GetGroups(userId string) ([]models.Group, error) {
 	return s.userRepository.GetGroups(userId)
 }
