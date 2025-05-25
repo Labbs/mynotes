@@ -4,13 +4,12 @@ export interface Document {
   id: string
   name: string
   space_id: string
-  type: 'document' | 'folder'
+  type: 'document'
   parent_id?: string
   slug?: string
   // properties: Property[]
   config: Config
   content?: string
-  is_favorite?: boolean
   created_at?: string
   updated_at?: string
 }
