@@ -154,6 +154,7 @@ func (dc *DocumentController) UpdateDocument(ctx *fiber.Ctx) error {
 	}
 
 	document.Content = documentRequest.Content
+	document.Config = documentRequest.Config
 
 	document, err = dc.DocumentService.UpdateDocument(document)
 	if err != nil {
