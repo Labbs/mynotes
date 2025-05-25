@@ -33,26 +33,14 @@ func (r *documentRepository) GetDocumentsFirstLevelForSpace(spaceId string) ([]m
 	return documents, err
 }
 
-func (r *documentRepository) GetDocumentById(id string, preloadBlock bool) (models.Document, error) {
+func (r *documentRepository) GetDocumentById(id string) (models.Document, error) {
 	var document models.Document
-	query := r.db.Debug().Table("document")
-	if preloadBlock {
-		query = query.Preload("Blocks", func(db *gorm.DB) *gorm.DB {
-			return db.Order("position ASC")
-		})
-	}
-	err := query.First(&document, "id = ?", id).Error
+	err := r.db.Debug().Table("document").First(&document, "id = ?", id).Error
 	return document, err
 }
 
-func (r *documentRepository) GetDocumentBySlug(slug string, preloadBlock bool) (models.Document, error) {
+func (r *documentRepository) GetDocumentBySlug(slug string) (models.Document, error) {
 	var document models.Document
-	query := r.db.Debug().Table("document")
-	if preloadBlock {
-		query = query.Preload("Blocks", func(db *gorm.DB) *gorm.DB {
-			return db.Order("position ASC")
-		})
-	}
-	err := query.First(&document, "slug = ?", slug).Error
+	err := r.db.Debug().Table("document").First(&document, "slug = ?", slug).Error
 	return document, err
 }

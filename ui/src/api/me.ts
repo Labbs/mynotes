@@ -1,4 +1,5 @@
 import api from './axios'
+import type { Document } from './document'
 
 const meApiUrl = '/v1/me'
 
@@ -19,6 +20,7 @@ export interface MyFavorite {
   document_id?: string
   database_id?: string
   position?: string
+  document?: Document
   created_at?: string
 }
 
@@ -37,5 +39,13 @@ export const meApi = {
 
   getMyFavorites: () => {
     return api.get<MyFavoritesResponse>(`${meApiUrl}/favorites`)
+  },
+
+  addFavorite: (documentId: string) => {
+    return api.post(`${meApiUrl}/favorites/${documentId}`, {})
+  },
+
+  unFavorite: (documentId: string) => {
+    return api.delete(`${meApiUrl}/favorites/${documentId}`)
   },
 }

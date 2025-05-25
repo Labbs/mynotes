@@ -51,7 +51,7 @@ func (dc *DocumentController) GetDocumentById(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
 	documentId := ctx.Params("documentId")
-	document, err := dc.DocumentService.GetDocumentById(documentId, false)
+	document, err := dc.DocumentService.GetDocumentById(documentId)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting document by id")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
@@ -75,7 +75,7 @@ func (dc *DocumentController) GetDocumentBySlug(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
 	slug := ctx.Params("slug")
-	document, err := dc.DocumentService.GetDocumentBySlug(slug, false)
+	document, err := dc.DocumentService.GetDocumentBySlug(slug)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting document by slug")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
@@ -137,7 +137,7 @@ func (dc *DocumentController) UpdateDocument(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
-	document, err := dc.DocumentService.GetDocumentById(documentId, false)
+	document, err := dc.DocumentService.GetDocumentById(documentId)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting document by id")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})

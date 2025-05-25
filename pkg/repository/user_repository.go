@@ -84,13 +84,6 @@ func (r *userRepository) Delete(id string) error {
 	return r.db.Debug().Where("id = ?", id).Delete(&models.User{}).Error
 }
 
-// GetOrderedFavorites returns the favorites of a user ordered by position
-func (r *userRepository) GetOrderedFavorites(id string) ([]models.Favorite, error) {
-	var favorites []models.Favorite
-	err := r.db.Debug().Table("favorite").Where("user_id = ?", id).Order("position ASC").Find(&favorites).Error
-	return favorites, err
-}
-
 // GetGroups returns the groups of a user
 func (r *userRepository) GetGroups(id string) ([]models.Group, error) {
 	var groups []models.Group
