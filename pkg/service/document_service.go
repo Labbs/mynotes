@@ -18,12 +18,12 @@ func (s *documentService) GetDocumentsFirstLevelForSpace(spaceId string) ([]mode
 	return s.documentRepository.GetDocumentsFirstLevelForSpace(spaceId)
 }
 
-func (s *documentService) GetDocumentBySlug(slug string, preloadBlock bool) (models.Document, error) {
-	return s.documentRepository.GetDocumentBySlug(slug, preloadBlock)
+func (s *documentService) GetDocumentBySlug(slug string) (models.Document, error) {
+	return s.documentRepository.GetDocumentBySlug(slug)
 }
 
-func (s *documentService) GetDocumentById(id string, preloadBlock bool) (models.Document, error) {
-	return s.documentRepository.GetDocumentById(id, preloadBlock)
+func (s *documentService) GetDocumentById(id string) (models.Document, error) {
+	return s.documentRepository.GetDocumentById(id)
 }
 
 func (s *documentService) UpdateDocument(document models.Document) (models.Document, error) {
