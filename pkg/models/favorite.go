@@ -15,6 +15,8 @@ type Favorite struct {
 
 	Position string `json:"position"`
 
+	Document Document `json:"document" gorm:"foreignKey:DocumentId;references:Id"`
+
 	CreatedAt time.Time `json:"created_at"`
 }
 
