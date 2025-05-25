@@ -48,7 +48,6 @@ type UserRepository interface {
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
-	GetOrderedFavorites(userId string) ([]Favorite, error)
 	GetGroups(userId string) ([]Group, error)
 }
 
@@ -60,6 +59,5 @@ type UserService interface {
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
-	GetOrderedFavorites(userId string) ([]Favorite, error)
 	GetGroups(userId string) ([]Group, error)
 }
