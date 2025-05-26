@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch, ref, onUnmounted, nextTick, type Directive } from 'vue';
+import { computed, onMounted, watch, ref, onUnmounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDocumentStore } from '../stores/document';
 import { useFavoriteStore } from '../stores/favorite';
