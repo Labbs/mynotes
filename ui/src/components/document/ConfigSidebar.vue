@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { type Document } from '../../api/document';
-import { Transition } from 'vue';
 
 const props = defineProps<{
   visible: boolean;
