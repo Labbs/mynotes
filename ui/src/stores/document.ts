@@ -82,8 +82,17 @@ export const useDocumentStore = defineStore('document', () => {
     if (!currentDocument.value) return
 
     try {
-      const { data } = await documentApi.updateDocumentConfig(currentDocument.value.id, config)
-      currentDocument.value = data
+      console.log('Store: Updating document config:', config)
+      // Mise à jour du document en utilisant updateDocument au lieu de updateDocumentConfig
+      const updatedDocument = {
+        id: currentDocument.value.id,
+        name: currentDocument.value.name,
+        space_id: currentDocument.value.space_id,
+        config: config
+      }
+      const result = await updateDocument(updatedDocument)
+      console.log('Store: Document config updated successfully:', result)
+      // currentDocument.value est déjà mis à jour dans updateDocument
     } catch (err) {
       console.error('Error updating document config:', err)
       error.value = 'Failed to update document config'
@@ -99,63 +108,10 @@ export const useDocumentStore = defineStore('document', () => {
     }
   }
 
-  async function updateDocument({ id, name, content, space_id }: Partial<Document>) {
+  async function updateDocument({ id, name, content, space_id, config }: Partial<Document>) {
     if (!id) return null;
     
     console.log('Store: Updating document:', { id, name, contentChanged: !!content, space_id });
-    
-    // Mise à jour optimiste maintenant que nous sommes sûrs qu'il y a des changements
-    if (currentDocument.value && currentDocument.value.id === id) {
-      if (content !== undefined) {
-        // Pour éviter de perdre la référence, mise à jour en profondeur
-        currentDocument.value = {
-          ...currentDocument.value,
-          content: content,
-          name: name !== undefined ? name : currentDocument.value.name
-        };
-      } else if (name !== undefined) {
-        currentDocument.value.name = name;
-        // Ajout important : si on met à jour seulement le nom, s'assurer de préserver le contenu
-        const documentToUpdate = {
-          id,
-          name,
-          space_id: space_id || currentDocument.value?.space_id,
-          // Toujours inclure le contenu actuel, même lors d'une mise à jour de nom uniquement
-          content: currentDocument.value.content
-        };
-        
-        try {
-          const { data } = await documentApi.updateDocument(id, documentToUpdate);
-          
-          // Mise à jour dans la liste des documents
-          if (data.space_id) {
-            const spaceId = data.space_id;
-            const index = documentsBySpace.value[spaceId]?.findIndex(d => d.id === id);
-            if (index !== -1 && documentsBySpace.value[spaceId]) {
-              documentsBySpace.value[spaceId][index] = data;
-            }
-          }
-          
-          // Mettre à jour le document actuel tout en préservant le contenu
-          if (currentDocument.value && currentDocument.value.id === id) {
-            if (data.slug !== currentDocument.value.slug) {
-              currentDocument.value.slug = data.slug;
-            }
-            
-            // Important: préserver le contenu
-            console.log('Store: Document updated with server response');
-          }
-          
-          return data;
-        } catch (error) {
-          console.error('Store: Error updating document:', error);
-          throw error;
-        }
-        
-        // Retourner pour éviter d'exécuter le reste de la fonction
-        return;
-      }
-    }
     
     try {
       const { data } = await documentApi.updateDocument(id, { 
@@ -163,6 +119,7 @@ export const useDocumentStore = defineStore('document', () => {
         name,
         space_id: space_id || currentDocument.value?.space_id,
         content,
+        config
       });
       
       // Mise à jour dans la liste des documents

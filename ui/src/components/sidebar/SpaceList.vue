@@ -224,11 +224,14 @@ onMounted(async () => {
             'bg-blue-50 text-blue-600 font-medium': doc.slug === currentSlug 
           }"
         >
-          <div 
+          <div v-if="!doc.config.icon"
             class="size-4 rounded bg-gray-100 flex items-center justify-center opacity-75 text-xs font-medium"
             :class="{ 'bg-blue-100': doc.slug === currentSlug }"
           >
             {{ doc.name?.[0]?.toUpperCase() }}
+          </div>
+          <div v-else>
+            {{ doc.config.icon }}
           </div>
           <span>{{ capitalizeFirst(doc.name) }}</span>
         </router-link>

@@ -96,7 +96,7 @@ func (p *Properties) Scan(value any) error {
 // DocumentConfig is the configuration for a document
 type DocumentConfig struct {
 	FullWidth        bool   `json:"full_width"`
-	Icon             string `json:"icon,omitempty"`
+	Icon             string `json:"icon"`
 	Lock             bool   `json:"lock"`
 	HeaderBackground string `json:"header_background"`
 }

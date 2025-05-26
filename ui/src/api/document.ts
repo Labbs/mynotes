@@ -36,9 +36,6 @@ export const documentApi = {
   getDocumentsBySpace: (spaceId: string) =>
     api.get<Document[]>(`/v1/document/space/${spaceId}`),
 
-  updateDocumentConfig: (documentId: string, config: Config) =>
-    api.patch<Document>(`/v1/document/${documentId}/config`, { config }),
-
   create: (params: CreateDocumentParams) =>
     api.post<Document>('/v1/document', params),
 

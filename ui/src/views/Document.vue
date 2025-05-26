@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useDocumentStore } from '../stores/document';
 import { useFavoriteStore } from '../stores/favorite';
 import { useEditor, EditorContent } from '@tiptap/vue-3';
+import Header from '../components/document/Header.vue';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Color } from "@tiptap/extension-color";
@@ -16,7 +17,7 @@ import suggestion from '../extensions/Suggestion';
 import Highlight from '@tiptap/extension-highlight';
 
 const route = useRoute()
-const documentStore = useDocumentStore()
+const documentStore = useDocumentStore();
 const favoritesStore = useFavoriteStore();
 const currentDocument = computed(() => documentStore.currentDocument)
 const isEditingTitle = ref(false)
@@ -25,9 +26,96 @@ const saveTimeout = ref<number | null>(null)
 const isEditing = ref(false)
 const editorInitialized = ref(false)
 const isEditorUpdating = ref(false)
+const configSidebarVisible = ref(false) // Pour suivre l'état de visibilité de la sidebar de configuration
+
+// Function to update document icon
+const updateDocumentIcon = async (icon: string) => {
+  console.log('updateDocumentIcon called with:', icon);
+  if (!currentDocument.value) return;
+  
+  currentDocument.value.config.icon = icon;
+  console.log('Current document before update:', currentDocument.value);
+  
+  try {
+    await documentStore.updateDocument({
+      id: currentDocument.value.id,
+      name: currentDocument.value.name,
+      content: currentDocument.value.content,
+      space_id: currentDocument.value.space_id,
+      config: currentDocument.value.config
+    });
+    await favoritesStore.fetchFavorites(); // Refresh favorites after update
+    console.log('Document icon updated successfully');
+  } catch (error) {
+    console.error('Failed to update document icon:', error);
+  }
+};
+
+const lockDocument = async (lock: boolean) => {
+  if (!currentDocument.value) return;
+  
+  // Mettre à jour l'état de verrouillage du document
+  currentDocument.value.config.lock = lock;
+  console.log('Locking document:', lock ? 'locked' : 'unlocked');
+  
+  // Utiliser la méthode intégrée de TipTap pour rendre l'éditeur non éditable
+  if (editor.value) {
+    editor.value.setEditable(!lock);
+  }
+  
+  try {
+    // Sauvegarder l'état de verrouillage dans la base de données
+    await documentStore.updateDocument({
+      id: currentDocument.value.id,
+      name: currentDocument.value.name,
+      content: currentDocument.value.content,
+      space_id: currentDocument.value.space_id,
+      config: currentDocument.value.config
+    });
+    console.log('Document lock state updated successfully');
+  } catch (error) {
+    // En cas d'erreur, rétablir l'état précédent
+    console.error('Failed to update document lock state:', error);
+    if (currentDocument.value) {
+      currentDocument.value.config.lock = !lock;
+      if (editor.value) {
+        editor.value.setEditable(lock);
+      }
+    }
+  }
+};
+
+const fullWidth = async (fullWidth: boolean) => {
+  if (!currentDocument.value) return;
+  
+  // Mettre à jour l'état de largeur complète du document
+  currentDocument.value.config.full_width = fullWidth;
+  
+  try {
+    await documentStore.updateDocument({
+      id: currentDocument.value.id,
+      name: currentDocument.value.name,
+      content: currentDocument.value.content,
+      space_id: currentDocument.value.space_id,
+      config: currentDocument.value.config
+    });
+    console.log('Document full width state updated successfully');
+  } catch (error) {
+    console.error('Failed to update document full width state:', error);
+  }
+};
+
+// Function to toggle editor editable state
+const toggleEditorEditable = (editable: boolean) => {
+  if (editor.value) {
+    console.log('Setting editor editable state to:', editable);
+    editor.value.setEditable(editable);
+  }
+};
 
 const editor = useEditor({
   content: '<p></p>', // Start with empty content
+  editable: currentDocument.value ? !currentDocument.value.config?.lock : true, // État initial de l'éditeur basé sur l'état de verrouillage du document
   extensions: [
     StarterKit.configure({
       heading: {
@@ -49,17 +137,28 @@ const editor = useEditor({
     }),
   ],
   onUpdate: ({ editor }) => {
-    // Save content when it changes
-    const content = editor.getHTML()
-    if (currentDocument.value && !isEditorUpdating.value) {
-      currentDocument.value.content = content
-      saveContent()
+    // Si l'éditeur n'est pas éditable (document verrouillé), ne rien faire
+    if (!editor.isEditable || !currentDocument.value || isEditorUpdating.value) {
+      return;
     }
+    
+    // Sauvegarder le contenu lorsqu'il change
+    const content = editor.getHTML();
+    currentDocument.value.content = content;
+    saveContent();
   },
 });
 
 // Mark editor as initialized
 editorInitialized.value = true;
+
+// Add this watch to ensure editor editable state is synchronized with document lock state
+watch(() => currentDocument.value?.config?.lock, (isLocked) => {
+  if (editor.value && isLocked !== undefined) {
+    console.log(`Document lock state changed to: ${isLocked ? 'locked' : 'unlocked'}`);
+    editor.value.setEditable(!isLocked);
+  }
+}, { immediate: true });
 
 // Add this watch to update the editor when document content changes
 watch(() => currentDocument.value?.content, (newContent) => {
@@ -118,13 +217,21 @@ const updateEditorFromDocument = () => {
     
     nextTick(() => {
       try {
+        // Mettre à jour le contenu
         if (currentDocument.value?.content) {
           editor.value?.commands.setContent(currentDocument.value.content);
         } else {
           editor.value?.commands.clearContent(true);
         }
         
-        editor.value?.setEditable(!currentDocument.value?.config?.lock);
+        // Mettre à jour l'état d'édition selon l'état de verrouillage
+        const isLocked = !!currentDocument.value?.config?.lock;
+        console.log('Document lock state:', isLocked ? 'locked' : 'unlocked');
+        
+        // Utiliser la méthode native de TipTap pour définir l'état éditable
+        if (editor.value && editor.value.isEditable !== !isLocked) {
+          editor.value.setEditable(!isLocked);
+        }
       } catch (error) {
         console.error('Error updating editor with document content:', error);
       } finally {
@@ -185,7 +292,8 @@ const updateTitle = async () => {
         id: currentDocument.value.id,
         name: editableTitle.value,
         content: currentContent, // Explicitly include the content
-        space_id: currentDocument.value.space_id
+        space_id: currentDocument.value.space_id,
+        config: currentDocument.value.config
       });
       
       isEditingTitle.value = false;
@@ -204,6 +312,8 @@ const updateTitle = async () => {
         if (editor.value && currentContent) {
           editor.value.commands.setContent(currentContent);
         }
+
+        await favoritesStore.fetchFavorites();
       }
       
       console.log('Document title updated successfully, content preserved');
@@ -222,7 +332,11 @@ const saveContent = async () => {
   }
   
   saveTimeout.value = window.setTimeout(async () => {
-    if (!currentDocument.value || !editor.value) return;
+    // Vérifier si le document est verrouillé avant de sauvegarder
+    if (!currentDocument.value || !editor.value || currentDocument.value.config?.lock) {
+      console.log('Not saving: document is null, editor is null, or document is locked');
+      return;
+    }
     
     try {
       // Marquer que nous sommes en train d'éditer pour éviter de re-rendre
@@ -232,7 +346,8 @@ const saveContent = async () => {
         id: currentDocument.value.id,
         name: currentDocument.value.name,
         content: currentDocument.value.content,
-        space_id: currentDocument.value.space_id
+        space_id: currentDocument.value.space_id,
+        config: currentDocument.value.config
       });
       
       console.log('Content auto-saved');
@@ -251,15 +366,10 @@ onUnmounted(() => {
   }
   editor.value?.destroy();
 });
-
-// Directive focus
-const vFocus: Directive = {
-  mounted: (el) => el.focus()
-}
 </script>
 
 <template>
-  <main class="flex-1 overflow-y-auto">
+  <main class="flex-1 overflow-y-auto relative">
     <!-- Afficher un indicateur de chargement -->
     <div v-if="documentStore.loadingDocument" class="flex justify-center items-center h-screen">
       <div class="animate-pulse text-xl text-gray-500">Loading the document</div>
@@ -267,39 +377,49 @@ const vFocus: Directive = {
     
     <!-- Afficher le contenu une fois chargé -->
     <template v-else-if="currentDocument">
-      <div class="sticky top-0 border-b border-e bg-white">
-        <div class="flex justify-between items-center h-16 px-8">
-          <div class="flex-1" />
-          <div v-if="isEditingTitle" class="flex-1">
-            <input v-model="editableTitle" type="text" class="w-full text-2xl font-medium text-gray-600 bg-transparent focus:outline-none text-center" @blur="updateTitle" @keyup.enter="($event.target as HTMLInputElement).blur()" v-focus />
+      <div class="flex relative h-full">
+        <div 
+          :class="{ 'mr-72': configSidebarVisible }" 
+          class="transition-all duration-300 ease-in-out w-full"
+        >
+          <Header 
+            :current-document="currentDocument" 
+            :is-editing-title="isEditingTitle" 
+            :editable-title="editableTitle"
+            @update-title="updateTitle"
+            @favorite="favorite"
+            @update:is-editing-title="(value) => { 
+              // N'autoriser l'édition du titre que si le document n'est pas verrouillé
+              if (!currentDocument?.config?.lock || !value) {
+                isEditingTitle = value;
+              }
+            }"
+            @update:editable-title="editableTitle = $event"
+            @setDocumentIcon="updateDocumentIcon"
+            @toggleEditorEditable="toggleEditorEditable"
+            @iconConfigVisibility="configSidebarVisible = $event"
+            @toggleLock="lockDocument"
+            @setFullWidth="fullWidth"
+          />
+          
+          <!-- This is where the editor should be rendered -->
+          <div class="editor-container px-8 py-4 relative"
+            :class="{ 'max-w-7xl mx-auto': !currentDocument?.config?.full_width }">
+            <div class="relative">
+              <editor-content v-if="editor" :editor="editor" class="prose max-w-none" />
+              <!-- Overlay semi-transparent sur tout l'éditeur quand verrouillé -->
+              <div 
+                v-if="currentDocument?.config?.lock" 
+                class="absolute inset-0 bg-gray-50 bg-opacity-20 z-10"
+                style="pointer-events: none;"
+              ></div>
+              <BubbleMenu :editor="editor" v-if="editor" />
+              <!-- Indicateur de verrouillage -->
+            </div>
+            <div v-if="!editor" class="min-h-[300px] border rounded p-4 flex items-center justify-center text-gray-400">
+              Loading editor...
+            </div>
           </div>
-          <h1 
-            v-else 
-            class="text-2xl font-medium text-gray-600 flex-1 text-center cursor-text"
-            @click="isEditingTitle = true"
-          >
-            {{ currentDocument.name }}
-          </h1>
-          <div class="flex-1 flex items-center justify-end gap-2">
-            <button class="text-gray-400 hover:text-yellow-500 transition-colors p-2 rounded-lg hover:bg-gray-100"
-              @click="favorite"
-              :class="{
-                'text-yellow-500': favoritesStore.favorites.some(f => f.document?.id === currentDocument?.id)
-              }">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- This is where the editor should be rendered -->
-      <div class="editor-container px-8 py-4">
-        <editor-content v-if="editor" :editor="editor" class="prose max-w-none" />
-        <BubbleMenu :editor="editor" v-if="editor" />
-        <div v-else class="min-h-[300px] border rounded p-4 flex items-center justify-center text-gray-400">
-          Loading editor...
         </div>
       </div>
     </template>
@@ -318,6 +438,51 @@ const vFocus: Directive = {
   padding: 1rem;
   border-radius: 0.25rem;
   outline: none;
+}
+
+/* Style pour l'éditeur verrouillé */
+.ProseMirror[contenteditable="false"] {
+  position: relative;
+  color: inherit !important; /* Forcer la même couleur de texte que l'éditeur normal */
+  opacity: 1 !important; /* Forcer l'opacité complète */
+}
+
+/* S'assurer que tous les éléments de texte à l'intérieur gardent leur style normal */
+.ProseMirror[contenteditable="false"] p,
+.ProseMirror[contenteditable="false"] h1,
+.ProseMirror[contenteditable="false"] h2,
+.ProseMirror[contenteditable="false"] h3,
+.ProseMirror[contenteditable="false"] ul,
+.ProseMirror[contenteditable="false"] ol,
+.ProseMirror[contenteditable="false"] li,
+.ProseMirror[contenteditable="false"] blockquote,
+.ProseMirror[contenteditable="false"] pre,
+.ProseMirror[contenteditable="false"] code {
+  color: inherit !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Styles spécifiques pour les liens et le texte formaté */
+.ProseMirror[contenteditable="false"] a {
+  color: #3b82f6 !important; /* Bleu standard pour les liens */
+  text-decoration: underline !important;
+  opacity: 1 !important;
+}
+
+.ProseMirror[contenteditable="false"] strong {
+  font-weight: bold !important;
+  opacity: 1 !important;
+}
+
+.ProseMirror[contenteditable="false"] em {
+  font-style: italic !important;
+  opacity: 1 !important;
+}
+
+/* Curseur approprié pour indiquer que l'édition est désactivée */
+.ProseMirror[contenteditable="false"] * {
+  cursor: default !important;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {

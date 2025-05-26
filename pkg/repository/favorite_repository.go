@@ -16,7 +16,7 @@ func NewFavoriteRepository(db *gorm.DB) *favoriteRepository {
 func (r *favoriteRepository) GetFavoritesByUserId(userId string) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 	err := r.db.Debug().Preload("Document", func(db *gorm.DB) *gorm.DB {
-		return db.Debug().Select("id", "slug", "name")
+		return db.Debug().Select("id", "slug", "name", "config")
 	}).Where("user_id = ?", userId).Order("position ASC").Find(&favorites).Error
 	return favorites, err
 }

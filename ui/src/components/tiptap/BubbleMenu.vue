@@ -71,6 +71,9 @@ const shouldShow = (params: {
   // Ne pas afficher si la sélection est vide
   if (empty) return false;
 
+  // Ne pas afficher si l'éditeur n'est pas éditable (document verrouillé)
+  if (!props.editor.isEditable) return false;
+
   // Ne pas afficher pour les images
   const nodeAtSelection = doc.nodeAt(from);
   if (nodeAtSelection && nodeAtSelection.type.name === "imageEditor") {
