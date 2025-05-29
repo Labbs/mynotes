@@ -45,4 +45,7 @@ export const documentApi = {
 
   getDocumentsByParentDocument: (spaceId: string, documentId: string) =>
     api.get<Document[]>(`/v1/document/space/${spaceId}/parent/${documentId}`),
+
+  deleteDocument: (documentId: string) =>
+    api.delete(`/v1/document/${documentId}`),
 }
