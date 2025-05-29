@@ -27,9 +27,9 @@ const isResizing = ref(false);
 
 const sidebarWidth = computed(() => {
   if (sidebarStore.isCollapsed && !isHovered.value) {
-    return "w-16";
+    return "w-24"; // Changement de w-16 (4rem/64px) à w-24 (6rem/96px)
   }
-  return { width: `${sidebarStore.width}px` };
+  return { width: `${sidebarStore.width}px`, minWidth: '212px' }; // Ajout d'une largeur minimale
 });
 
 function startResize(_event: MouseEvent) {
@@ -72,8 +72,8 @@ const handleLogout = () => {
     <div
       :style="sidebarStore.isCollapsed && !isHovered ? {} : sidebarWidth"
       :class="[
-        sidebarStore.isCollapsed && !isHovered ? 'w-16' : '',
-        'flex h-screen flex-col justify-between border-e bg-white transition-all duration-300',
+        sidebarStore.isCollapsed && !isHovered ? 'w-24' : '', // Changement de w-16 à w-24
+        'flex h-screen flex-col justify-between border-e bg-white transition-all duration-300 min-w-[200px]', // Ajout de min-w-[200px]
         { 'transition-none': isResizing },
       ]"
       @mouseenter="isHovered = true"
