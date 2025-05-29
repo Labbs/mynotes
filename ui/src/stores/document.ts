@@ -174,6 +174,29 @@ export const useDocumentStore = defineStore('document', () => {
     }
   }
 
+  async function deleteDocument(documentId: string) {
+    if (!documentId) return null;
+
+    try {
+      await documentApi.deleteDocument(documentId);
+      // Supprimer le document de la liste des documents par espace
+      Object.keys(documentsBySpace.value).forEach(spaceId => {
+        documentsBySpace.value[spaceId] = documentsBySpace.value[spaceId].filter(doc => doc.id !== documentId);
+      });
+      // Supprimer le document de la liste des documents par parent
+      Object.keys(documentsByParent.value).forEach(parentId => {
+        documentsByParent.value[parentId] = documentsByParent.value[parentId].filter(doc => doc.id !== documentId);
+      });
+      // Supprimer le document de currentDocument si c'est le même
+      if (currentDocument.value && currentDocument.value.id === documentId) {
+        currentDocument.value = null;
+      }
+    } catch (error) {
+      console.error('Store: Error deleting document:', error);
+      throw error;
+    }
+  }
+
   return {
     currentDocument,
     documentsBySpace,
@@ -190,6 +213,7 @@ export const useDocumentStore = defineStore('document', () => {
     updateDocument,
     fetchDocumentById,
     fetchDocumentBySlug,
-    fetchDocumentsByParentDocument
+    fetchDocumentsByParentDocument,
+    deleteDocument
   }
 })
