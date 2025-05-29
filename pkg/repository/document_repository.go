@@ -33,6 +33,12 @@ func (r *documentRepository) GetDocumentsFirstLevelForSpace(spaceId string) ([]m
 	return documents, err
 }
 
+func (r *documentRepository) GetDocumentsFirstLevelByDocumentId(spaceId, documentId string) ([]models.Document, error) {
+	var documents []models.Document
+	err := r.db.Debug().Table("document").Where("space_id = ? AND parent_id = ?", spaceId, documentId).Find(&documents).Error
+	return documents, err
+}
+
 func (r *documentRepository) GetDocumentById(id string) (models.Document, error) {
 	var document models.Document
 	err := r.db.Debug().Table("document").First(&document, "id = ?", id).Error

@@ -18,6 +18,10 @@ func (s *documentService) GetDocumentsFirstLevelForSpace(spaceId string) ([]mode
 	return s.documentRepository.GetDocumentsFirstLevelForSpace(spaceId)
 }
 
+func (s *documentService) GetDocumentsFirstLevelByDocumentId(spaceId, documentId string) ([]models.Document, error) {
+	return s.documentRepository.GetDocumentsFirstLevelByDocumentId(spaceId, documentId)
+}
+
 func (s *documentService) GetDocumentBySlug(slug string) (models.Document, error) {
 	return s.documentRepository.GetDocumentBySlug(slug)
 }
