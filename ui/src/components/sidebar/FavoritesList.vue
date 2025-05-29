@@ -33,7 +33,7 @@ onMounted(async() => {
       <div v-else>
         {{ favorite.document?.config.icon }}
       </div>
-      <span v-show="!isCollapsed || isHovered" class="flex-grow text-left">{{ capitalizeFirst(favorite.document?.name) }}</span>
+      <span v-show="!isCollapsed || isHovered" class="flex-grow text-left truncate overflow-hidden text-ellipsis">{{ capitalizeFirst(favorite.document?.name) }}</span>
     </router-link>
   </div>
 </template>
