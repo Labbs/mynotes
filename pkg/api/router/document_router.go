@@ -27,4 +27,5 @@ func NewDocumentRouter(config *Config) {
 	v1Document.Get("/:documentId", c.GetDocumentById)
 	v1Document.Post("/", c.CreateDocument)
 	v1Document.Put("/:documentId", c.UpdateDocument)
+	v1Document.Delete("/:documentId", c.DeleteDocument)
 }
