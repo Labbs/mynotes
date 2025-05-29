@@ -137,6 +137,7 @@ type DocumentRepository interface {
 	GetDocumentBySlug(slug string) (Document, error)
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
+	DeleteDocument(id string) error
 }
 
 // DocumentService is the service for documents
@@ -147,4 +148,5 @@ type DocumentService interface {
 	GetDocumentBySlug(slug string) (Document, error)
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
+	DeleteDocument(id string) error
 }
