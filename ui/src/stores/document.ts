@@ -5,10 +5,17 @@ import { documentApi, type Document, type CreateDocumentParams, type Config } fr
 export const useDocumentStore = defineStore('document', () => {
   const currentDocument = ref<Document | null>(null)
   const documentsBySpace = ref<Record<string, Document[]>>({})
+  const documentsByParent = ref<Record<string, Document[]>>({}) // Pour stocker les sous-documents par parent
+  const documentsWithChildren = ref<Set<string>>(new Set()) // Pour stocker les documents qui ont des enfants
   const loadingSpaces = ref<Set<string>>(new Set())
   const loadingDocument = ref(false)
   const error = ref<string | null>(null)
-
+  
+  // Pour vérifier si un document a des enfants
+  function hasChildren(documentId: string): boolean {
+    return documentsWithChildren.value.has(documentId)
+  }
+  
   async function fetchDocument(slug: string) {
     loadingDocument.value = true;
     error.value = null;
@@ -75,6 +82,25 @@ export const useDocumentStore = defineStore('document', () => {
     } catch (err) {
       console.error('Error fetching document by slug:', err)
       error.value = 'Failed to fetch document by slug'
+    }
+  }
+
+  async function fetchDocumentsByParentDocument(spaceId: string, documentId: string) {
+    if (!spaceId || !documentId) return
+
+    try {
+      const { data } = await documentApi.getDocumentsByParentDocument(spaceId, documentId)
+      documentsByParent.value[documentId] = data
+      
+      // Mettre à jour documentsWithChildren
+      if (data && data.length > 0) {
+        documentsWithChildren.value.add(documentId)
+      } else {
+        documentsWithChildren.value.delete(documentId)
+      }
+    } catch (err) {
+      console.error('Error fetching documents by parent document:', err)
+      error.value = 'Failed to fetch documents by parent document'
     }
   }
 
@@ -151,6 +177,9 @@ export const useDocumentStore = defineStore('document', () => {
   return {
     currentDocument,
     documentsBySpace,
+    documentsByParent,
+    documentsWithChildren,
+    hasChildren,
     loadingSpaces,
     error,
     fetchDocument,
@@ -161,5 +190,6 @@ export const useDocumentStore = defineStore('document', () => {
     updateDocument,
     fetchDocumentById,
     fetchDocumentBySlug,
+    fetchDocumentsByParentDocument
   }
 })
