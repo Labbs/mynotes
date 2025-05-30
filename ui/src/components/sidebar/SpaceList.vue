@@ -276,7 +276,7 @@ onMounted(async () => {
         >
           <button
             class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-            @click="createDocument(space.id, null)"
+            @click="createDocument(space.id, '')"
           >
             <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
