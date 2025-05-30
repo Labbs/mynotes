@@ -1,8 +1,4 @@
 <script setup lang="ts">
-const { isCollapsed, isHovered } = defineProps<{
-  isCollapsed: boolean,
-  isHovered: boolean
-}>()
 </script>
 
 <template>
@@ -13,7 +9,7 @@ const { isCollapsed, isHovered } = defineProps<{
       >
         <span class="font-medium">MN</span>
       </div>
-      <span v-show="!isCollapsed || isHovered" class="font-medium">My Notes</span>
+      <span class="font-medium">My Notes</span>
     </router-link>
   </div>
 </template>
