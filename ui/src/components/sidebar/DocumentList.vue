@@ -7,8 +7,6 @@ const props = defineProps<{
   documents: any[]
   spaceId: string
   expandedDocumentIds: string[]
-  isCollapsed: boolean
-  isHovered: boolean
 }>()
 
 const emit = defineEmits<{
@@ -126,7 +124,7 @@ const createDocument = (parentId: string, event: Event) => {
         
         <!-- Action buttons pour document (en position absolue) -->
         <div 
-          v-if="!isCollapsed || isHovered"
+          v-if="isHovered"
           class="absolute right-1 flex items-center h-full transition-opacity"
           :class="{ 'opacity-100': isHovered(doc.id), 'opacity-0': !isHovered(doc.id) }"
         >
@@ -155,7 +153,6 @@ const createDocument = (parentId: string, event: Event) => {
           :documents="documentStore.documentsByParent[doc.id]"
           :space-id="spaceId"
           :expanded-document-ids="expandedDocumentIds"
-          :is-collapsed="isCollapsed"
           :is-hovered="isHovered"
           @toggle-document="(spaceId, docId) => $emit('toggleDocument', spaceId, docId)"
           @create-document="(spaceId, parentId) => $emit('createDocument', spaceId, parentId)"
