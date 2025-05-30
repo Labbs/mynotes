@@ -24,6 +24,7 @@ export interface Config {
 export interface CreateDocumentParams {
   name: string
   space_id: string
+  parent_id?: string
 }
 
 export const documentApi = {
@@ -41,4 +42,10 @@ export const documentApi = {
 
   updateDocument: (documentId: string, params: Partial<Document>) =>
     api.put<Document>(`/v1/document/${documentId}`, params),
+
+  getDocumentsByParentDocument: (spaceId: string, documentId: string) =>
+    api.get<Document[]>(`/v1/document/space/${spaceId}/parent/${documentId}`),
+
+  deleteDocument: (documentId: string) =>
+    api.delete(`/v1/document/${documentId}`),
 }

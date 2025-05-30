@@ -32,6 +32,17 @@ interface MySpacesResponse {
   spaces: MySpace[]
 }
 
+export interface Profile {
+  id: string
+  email: string
+  name: string
+  avatar?: string
+  created_at?: string
+  updated_at?: string
+}
+
+
+
 export const meApi = {
   getMySpaces: () => {
     return api.get<MySpacesResponse>(`${meApiUrl}/spaces`)
@@ -39,6 +50,10 @@ export const meApi = {
 
   getMyFavorites: () => {
     return api.get<MyFavoritesResponse>(`${meApiUrl}/favorites`)
+  },
+
+  getProfile: () => {
+    return api.get<Profile>(`${meApiUrl}/profile`)
   },
 
   addFavorite: (documentId: string) => {

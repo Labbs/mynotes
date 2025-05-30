@@ -37,6 +37,31 @@ func (dc *DocumentController) GetDocumentsFromSpace(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(documents)
 }
 
+// GetDocumentsFromParentDocument godoc
+// @Summary Get documents from parent document
+// @Description Get documents from parent document
+// @Tags document
+// @Accept json
+// @Produce json
+// @Param spaceId path string true "Space Id"
+// @Param documentId path string true "Document Id"
+// @Success 200 {array} models.Document
+// @Failure 500 {object} models.ErrorResponse
+func (dc *DocumentController) GetDocumentsFromParentDocument(ctx *fiber.Ctx) error {
+	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
+
+	spaceId := ctx.Params("spaceId")
+	documentId := ctx.Params("documentId")
+	documents, err := dc.DocumentService.GetDocumentsFirstLevelByDocumentId(spaceId, documentId)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error getting documents from parent document")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	logger.Debug().Str("space", spaceId).Str("document", documentId).Msg("Documents retrieved successfully")
+	return ctx.Status(fiber.StatusOK).JSON(documents)
+}
+
 // GetDocumentById godoc
 // @Summary Get document by id
 // @Description Get document by id
@@ -164,4 +189,28 @@ func (dc *DocumentController) UpdateDocument(ctx *fiber.Ctx) error {
 
 	logger.Debug().Str("document", document.Id).Msg("Document updated successfully")
 	return ctx.Status(fiber.StatusOK).JSON(document)
+}
+
+// DeleteDocument godoc
+// @Summary Delete document
+// @Description Delete document
+// @Tags document
+// @Accept json
+// @Produce json
+// @Param documentId path string true "Document Id"
+// @Success 204
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/document/{documentId} [delete]
+func (dc *DocumentController) DeleteDocument(ctx *fiber.Ctx) error {
+	logger := dc.Logger.With().Str("event", "api.documents.delete").Logger()
+
+	documentId := ctx.Params("documentId")
+	err := dc.DocumentService.DeleteDocument(documentId)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error deleting document")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	logger.Debug().Str("document", documentId).Msg("Document deleted successfully")
+	return ctx.SendStatus(fiber.StatusNoContent)
 }

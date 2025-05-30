@@ -18,6 +18,10 @@ func (s *documentService) GetDocumentsFirstLevelForSpace(spaceId string) ([]mode
 	return s.documentRepository.GetDocumentsFirstLevelForSpace(spaceId)
 }
 
+func (s *documentService) GetDocumentsFirstLevelByDocumentId(spaceId, documentId string) ([]models.Document, error) {
+	return s.documentRepository.GetDocumentsFirstLevelByDocumentId(spaceId, documentId)
+}
+
 func (s *documentService) GetDocumentBySlug(slug string) (models.Document, error) {
 	return s.documentRepository.GetDocumentBySlug(slug)
 }
@@ -28,4 +32,29 @@ func (s *documentService) GetDocumentById(id string) (models.Document, error) {
 
 func (s *documentService) UpdateDocument(document models.Document) (models.Document, error) {
 	return s.documentRepository.UpdateDocument(document)
+}
+
+func (s *documentService) DeleteDocument(id string) error {
+	// get document by id
+	document, err := s.documentRepository.GetDocumentById(id)
+	// List all child documents and delete them recursively
+	if err != nil {
+		return err
+	}
+	// infinite loop to delete all child documents
+	for {
+		childDocuments, err := s.documentRepository.GetDocumentsFirstLevelByDocumentId(document.SpaceId, document.Id)
+		if err != nil {
+			return err
+		}
+		if len(childDocuments) == 0 {
+			break
+		}
+		for _, childDocument := range childDocuments {
+			if err := s.DeleteDocument(childDocument.Id); err != nil {
+				return err
+			}
+		}
+	}
+	return s.documentRepository.DeleteDocument(id)
 }

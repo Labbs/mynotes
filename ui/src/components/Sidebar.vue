@@ -22,14 +22,13 @@ onMounted(() => {
   favoritesStore.fetchFavorites();
 });
 
-const isHovered = ref(false);
 const isResizing = ref(false);
 
 const sidebarWidth = computed(() => {
-  if (sidebarStore.isCollapsed && !isHovered.value) {
-    return "w-16";
+  if (sidebarStore.isCollapsed && !sidebarStore.isHovering) {
+    return { width: '0px', minWidth: '0px' }; // Complètement masqué quand collapse
   }
-  return { width: `${sidebarStore.width}px` };
+  return { width: `${sidebarStore.width}px`, minWidth: '212px' };
 });
 
 function startResize(_event: MouseEvent) {
@@ -65,27 +64,39 @@ const handleLogout = () => {
   authStore.logout();
   router.push("/auth/login");
 };
+
+const handleMouseEnter = () => {
+  sidebarStore.setHovering(true);
+};
+
+const handleMouseLeave = () => {
+  sidebarStore.setHovering(false);
+};
 </script>
 
 <template>
-  <div class="flex">
+  <div class="flex overflow-hidden"
+    :class="{
+      'w-0': sidebarStore.isCollapsed && !sidebarStore.isHovering,
+      'w-auto': !sidebarStore.isCollapsed || sidebarStore.isHovering,
+    }">
     <div
-      :style="sidebarStore.isCollapsed && !isHovered ? {} : sidebarWidth"
+      :style="sidebarStore.isCollapsed && !sidebarStore.isHovering ? { width: '0px', minWidth: '0px' } : sidebarWidth"
       :class="[
-        sidebarStore.isCollapsed && !isHovered ? 'w-16' : '',
         'flex h-screen flex-col justify-between border-e bg-white transition-all duration-300',
         { 'transition-none': isResizing },
       ]"
-      @mouseenter="isHovered = true"
-      @mouseleave="isHovered = false"
+      @mouseenter="handleMouseEnter"
+      @mouseleave="handleMouseLeave"
     >
       <div>
         <div class="flex items-center justify-between p-2">
           <Header
             :isCollapsed="sidebarStore.isCollapsed"
-            :isHovered="isHovered"
+            :isHovered="sidebarStore.isHovering"
           />
           <button
+            v-show="!sidebarStore.isCollapsed"
             @click="sidebarStore.toggleCollapse"
             class="p-2 hover:bg-gray-100 rounded-lg"
           >
@@ -100,11 +111,7 @@ const handleLogout = () => {
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                :d="
-                  sidebarStore.isCollapsed
-                    ? 'M13 5l7 7-7 7M5 5l7 7-7 7'
-                    : 'M11 19l-7-7 7-7M19 19l-7-7 7-7'
-                "
+                d="M11 19l-7-7 7-7M19 19l-7-7 7-7"
               />
             </svg>
           </button>
@@ -114,7 +121,7 @@ const handleLogout = () => {
           <div class="px-2">
             <CommonMenu
               :isCollapsed="sidebarStore.isCollapsed"
-              :isHovered="isHovered"
+              :isHovered="sidebarStore.isHovering"
             />
           </div>
         </div>
@@ -123,7 +130,7 @@ const handleLogout = () => {
           <div class="px-2">
             <FavoritesList
               :isCollapsed="sidebarStore.isCollapsed"
-              :isHovered="isHovered"
+              :isHovered="sidebarStore.isHovering"
             />
           </div>
         </div>
@@ -132,7 +139,7 @@ const handleLogout = () => {
           <div class="px-2">
             <SpaceList
               :isCollapsed="sidebarStore.isCollapsed"
-              :isHovered="isHovered"
+              :isHovered="sidebarStore.isHovering"
             />
           </div>
         </div>
@@ -162,11 +169,8 @@ const handleLogout = () => {
             </svg>
 
             <span
-              v-show="!sidebarStore.isCollapsed || isHovered"
-              class="text-[13px]"
-            >
-              Logout
-            </span>
+              v-show="!sidebarStore.isCollapsed || sidebarStore.isHovering"
+              class="text-[13px]">Logout</span>
           </button>
         </form>
       </div>
@@ -174,7 +178,7 @@ const handleLogout = () => {
 
     <!-- Resizer -->
     <div
-      v-show="!sidebarStore.isCollapsed || isHovered"
+      v-show="!sidebarStore.isCollapsed || sidebarStore.isHovering"
       class="w-1 hover:w-2 bg-transparent hover:bg-gray-200 cursor-col-resize transition-all"
       @mousedown.prevent="startResize"
     />
@@ -185,7 +189,7 @@ const handleLogout = () => {
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 10ms;
+  transition-duration: 300ms;
 }
 
 /* Désactiver la sélection de texte pendant le redimensionnement */

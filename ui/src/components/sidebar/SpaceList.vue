@@ -3,6 +3,7 @@ import { onMounted, ref, computed, watch } from 'vue'
 import { useSpaceStore } from '../../stores/space'
 import { useDocumentStore } from '../../stores/document'
 import { useRouter, useRoute } from 'vue-router'
+import DocumentList from './DocumentList.vue'
 
 // Use defineProps without assigning to a variable
 const { isCollapsed, isHovered } = defineProps<{
@@ -12,20 +13,27 @@ const { isCollapsed, isHovered } = defineProps<{
 
 const spaceStore = useSpaceStore()
 const documentStore = useDocumentStore()
-const expandedSpaces = ref<Set<string>>(new Set())
+// Utiliser des arrays plutôt que des Set pour éviter les problèmes de typage
+const expandedSpaceIds = ref<string[]>([])
+const expandedDocumentIds = ref<string[]>([])
 const router = useRouter()
 const route = useRoute()
 const currentSlug = computed(() => route.params.slug as string)
 
 // Chargement des espaces développés depuis le localStorage
-const loadExpandedSpaces = () => {
+const loadExpandedItems = () => {
   try {
     const savedExpandedSpaces = localStorage.getItem('mynotes_expanded_spaces')
     if (savedExpandedSpaces) {
-      expandedSpaces.value = new Set(JSON.parse(savedExpandedSpaces))
+      expandedSpaceIds.value = JSON.parse(savedExpandedSpaces)
+    }
+    
+    const savedExpandedDocuments = localStorage.getItem('mynotes_expanded_documents')
+    if (savedExpandedDocuments) {
+      expandedDocumentIds.value = JSON.parse(savedExpandedDocuments)
     }
   } catch (err) {
-    console.error('Failed to load expanded spaces from localStorage:', err)
+    console.error('Failed to load expanded items from localStorage:', err)
   }
 }
 
@@ -34,46 +42,104 @@ const saveExpandedSpaces = () => {
   try {
     localStorage.setItem(
       'mynotes_expanded_spaces',
-      JSON.stringify([...expandedSpaces.value])
+      JSON.stringify(expandedSpaceIds.value)
     )
   } catch (err) {
     console.error('Failed to save expanded spaces to localStorage:', err)
   }
 }
 
-// Observer les changements dans expandedSpaces et les sauvegarder
-watch(expandedSpaces.value, saveExpandedSpaces, { deep: true })
+// Sauvegarde des documents développés dans le localStorage
+const saveExpandedDocuments = () => {
+  try {
+    localStorage.setItem(
+      'mynotes_expanded_documents',
+      JSON.stringify(expandedDocumentIds.value)
+    )
+  } catch (err) {
+    console.error('Failed to save expanded documents to localStorage:', err)
+  }
+}
+
+// Observer les changements dans expandedSpaceIds et expandedDocumentIds
+watch(expandedSpaceIds, saveExpandedSpaces, { deep: true })
+watch(expandedDocumentIds, saveExpandedDocuments, { deep: true })
+
+// Vérifier les documents parents après chargement des espaces
+watch(() => documentStore.documentsBySpace, (newVal) => {
+  // Pour chaque espace
+  for (const spaceId in newVal) {
+    // Parcourir les documents pour trouver ceux avec parent_id
+    for (const doc of newVal[spaceId]) {
+      if (doc.parent_id && doc.parent_id !== '') {
+        // Marquer le parent comme ayant des enfants
+        documentStore.documentsWithChildren.add(doc.parent_id)
+      }
+    }
+  }
+}, { deep: true })
 
 const capitalizeFirst = (str: string) => {
   if (!str) return ''
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-const toggleSpace = async (spaceId: string) => {
-  if (expandedSpaces.value.has(spaceId)) {
-    expandedSpaces.value.delete(spaceId)
-  } else {
-    expandedSpaces.value.add(spaceId)
-    await documentStore.fetchDocumentsBySpace(spaceId)
-  }
-  saveExpandedSpaces() // Sauvegarder après la modification
+const isSpaceExpanded = (spaceId: string) => {
+  return expandedSpaceIds.value.includes(spaceId)
 }
 
-const createDocument = async (spaceId: string) => {
+const isDocumentExpanded = (documentId: string) => {
+  return expandedDocumentIds.value.includes(documentId)
+}
+
+const toggleSpace = async (spaceId: string) => {
+  if (isSpaceExpanded(spaceId)) {
+    expandedSpaceIds.value = expandedSpaceIds.value.filter(id => id !== spaceId)
+  } else {
+    expandedSpaceIds.value.push(spaceId)
+    await documentStore.fetchDocumentsBySpace(spaceId)
+  }
+}
+
+const toggleDocument = async (spaceId: string, documentId: string) => {
+  if (isDocumentExpanded(documentId)) {
+    expandedDocumentIds.value = expandedDocumentIds.value.filter(id => id !== documentId)
+  } else {
+    expandedDocumentIds.value.push(documentId)
+    
+    // Toujours recharger les sous-documents lorsqu'on étend un document
+    await documentStore.fetchDocumentsByParentDocument(spaceId, documentId)
+  }
+}
+
+const createDocument = async (spaceId: string, parentId: string) => {
   try {
     const doc = await documentStore.createDocument({
       name: 'New document',
-      space_id: spaceId
+      space_id: spaceId,
+      parent_id: parentId
     })
     
     // Ouvrir le space s'il n'est pas déjà ouvert
-    if (!expandedSpaces.value.has(spaceId)) {
-      expandedSpaces.value.add(spaceId)
-      saveExpandedSpaces() // Sauvegarder après la modification
+    if (!isSpaceExpanded(spaceId)) {
+      expandedSpaceIds.value.push(spaceId)
     }
     
-    // On force le rafraîchissement des documents
+    // Si c'est un sous-document, ouvrir le parent s'il n'est pas déjà ouvert
+    if (parentId && !isDocumentExpanded(parentId)) {
+      expandedDocumentIds.value.push(parentId)
+      
+      // Marquer le parent comme ayant des enfants
+      documentStore.documentsWithChildren.add(parentId)
+    }
+    
+    // Forcer le rafraîchissement des documents
     await documentStore.fetchDocumentsBySpace(spaceId, true)
+    
+    // Si c'est un sous-document, charger les sous-documents du parent
+    if (parentId) {
+      await documentStore.fetchDocumentsByParentDocument(spaceId, parentId)
+    }
     
     // Rediriger vers le nouveau document
     router.push(`/d/${doc.slug}`)
@@ -83,17 +149,16 @@ const createDocument = async (spaceId: string) => {
 }
 
 const showSpaceMenu = (spaceId: string) => {
-  // TODO: Implement space menu
   console.log('Space menu clicked for space:', spaceId)
 }
 
 onMounted(async () => {
   await spaceStore.fetchSpaces()
-  loadExpandedSpaces() // Charger les espaces développés au montage du composant
+  loadExpandedItems() // Charger les espaces et documents développés
   
   // Charger les documents pour tous les espaces déjà ouverts
   const loadDocumentsForExpandedSpaces = async () => {
-    const promises = Array.from(expandedSpaces.value).map(spaceId => 
+    const promises = expandedSpaceIds.value.map(spaceId => 
       documentStore.fetchDocumentsBySpace(spaceId)
     )
     await Promise.all(promises)
@@ -101,16 +166,49 @@ onMounted(async () => {
   
   await loadDocumentsForExpandedSpaces()
   
+  // Charger les sous-documents pour tous les documents déjà ouverts
+  const loadDocumentsForExpandedDocuments = async () => {
+    const promises = []
+    
+    // Pour chaque espace ouvert
+    for (const spaceId of expandedSpaceIds.value) {
+      // Pour chaque document ouvert dans cet espace
+      if (documentStore.documentsBySpace[spaceId]) {
+        for (const doc of documentStore.documentsBySpace[spaceId]) {
+          if (expandedDocumentIds.value.includes(doc.id)) {
+            // Force le rechargement des sous-documents pour chaque document expanded
+            promises.push(documentStore.fetchDocumentsByParentDocument(spaceId, doc.id))
+          }
+        }
+      }
+    }
+    
+    await Promise.all(promises)
+  }
+  
+  await loadDocumentsForExpandedDocuments()
+  
   // Ouvrir automatiquement le space du document actuellement ouvert
   const openCurrentDocumentSpace = async () => {
     if (currentSlug.value) {
       try {
         await documentStore.fetchDocumentBySlug(currentSlug.value)
         if (documentStore.currentDocument && documentStore.currentDocument.space_id) {
-          if (!expandedSpaces.value.has(documentStore.currentDocument.space_id)) {
-            expandedSpaces.value.add(documentStore.currentDocument.space_id)
-            await documentStore.fetchDocumentsBySpace(documentStore.currentDocument.space_id)
-            saveExpandedSpaces()
+          const spaceId = documentStore.currentDocument.space_id
+          
+          // Ouvrir l'espace si nécessaire
+          if (!isSpaceExpanded(spaceId)) {
+            expandedSpaceIds.value.push(spaceId)
+            await documentStore.fetchDocumentsBySpace(spaceId)
+          }
+          
+          // Si le document actuel a un parent_id, on ouvre ce parent
+          if (documentStore.currentDocument.parent_id) {
+            const parentId = documentStore.currentDocument.parent_id
+            if (!isDocumentExpanded(parentId)) {
+              expandedDocumentIds.value.push(parentId)
+              await documentStore.fetchDocumentsByParentDocument(spaceId, parentId)
+            }
           }
         }
       } catch (err) {
@@ -126,15 +224,10 @@ onMounted(async () => {
 <template>
   <div class="pt-2 pb-1 text-[13px]">
     <div v-for="space in spaceStore.spaces" :key="space.id">
-      <div 
-        class="group flex items-center"
-      >
+      <div class="group flex items-center">
         <button
           @click="toggleSpace(space.id)"
           class="flex flex-1 items-center gap-x-2 rounded-lg px-1 py-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-          :class="{
-            'justify-center': isCollapsed && !isHovered
-          }"
         >
           <div class="relative flex-shrink-0">
             <!-- Space icon (visible by default, hidden on hover) -->
@@ -155,14 +248,13 @@ onMounted(async () => {
 
             <!-- Chevron icon (hidden by default, visible on hover) -->
             <svg
-              v-show="(!isCollapsed || isHovered)"
               class="absolute inset-0 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
             >
               <path 
-                :d="expandedSpaces.has(space.id) ? 'M19 9l-7 7-7-7' : 'M9 5l7 7-7 7'"
+                :d="isSpaceExpanded(space.id) ? 'M19 9l-7 7-7-7' : 'M9 5l7 7-7 7'"
                 stroke-width="2" 
                 stroke-linecap="round" 
                 stroke-linejoin="round"
@@ -171,8 +263,7 @@ onMounted(async () => {
           </div>
 
           <span 
-            v-show="!isCollapsed || isHovered"
-            class="flex-grow text-left"
+            class="flex-grow text-left truncate overflow-hidden text-ellipsis"
           >
             {{ capitalizeFirst(space.name) }}
           </span>
@@ -185,7 +276,7 @@ onMounted(async () => {
         >
           <button
             class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-            @click="createDocument(space.id)"
+            @click="createDocument(space.id, '')"
           >
             <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -205,8 +296,8 @@ onMounted(async () => {
 
       <!-- Documents list -->
       <div 
-        v-if="expandedSpaces.has(space.id) && (!isCollapsed || isHovered)"
-        class="ml-4 mt-1 space-y-1"
+        v-if="isSpaceExpanded(space.id)"
+        class="ml-2 mt-1"
       >
         <div v-if="documentStore.loadingSpaces.has(space.id)" class="text-[14px] text-gray-500 px-2">
           Loading...
@@ -214,27 +305,14 @@ onMounted(async () => {
         <div v-else-if="!documentStore.documentsBySpace[space.id]?.length" class="text-[13px] text-gray-500 px-2">
           No documents
         </div>
-        <router-link
+        <DocumentList
           v-else
-          v-for="doc in documentStore.documentsBySpace[space.id]"
-          :key="doc.id"
-          :to="`/d/${doc.slug}`"
-          class="flex items-center gap-x-2 rounded-lg px-2 py-1 text-[13px] text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-          :class="{ 
-            'bg-blue-50 text-blue-600 font-medium': doc.slug === currentSlug 
-          }"
-        >
-          <div v-if="!doc.config.icon"
-            class="size-4 rounded bg-gray-100 flex items-center justify-center opacity-75 text-xs font-medium"
-            :class="{ 'bg-blue-100': doc.slug === currentSlug }"
-          >
-            {{ doc.name?.[0]?.toUpperCase() }}
-          </div>
-          <div v-else>
-            {{ doc.config.icon }}
-          </div>
-          <span>{{ capitalizeFirst(doc.name) }}</span>
-        </router-link>
+          :documents="documentStore.documentsBySpace[space.id].filter(doc => !doc.parent_id || doc.parent_id === '')"
+          :space-id="space.id"
+          :expanded-document-ids="expandedDocumentIds"
+          @toggle-document="toggleDocument"
+          @create-document="createDocument"
+        />
       </div>
     </div>
   </div>

@@ -133,16 +133,20 @@ func (dc *DocumentConfig) Scan(value any) error {
 type DocumentRepository interface {
 	CreateDocument(document Document) (Document, error)
 	GetDocumentsFirstLevelForSpace(spaceId string) ([]Document, error)
+	GetDocumentsFirstLevelByDocumentId(spaceId, documentId string) ([]Document, error)
 	GetDocumentBySlug(slug string) (Document, error)
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
+	DeleteDocument(id string) error
 }
 
 // DocumentService is the service for documents
 type DocumentService interface {
 	CreateDocument(document Document) (Document, error)
 	GetDocumentsFirstLevelForSpace(spaceId string) ([]Document, error)
+	GetDocumentsFirstLevelByDocumentId(spaceId, documentId string) ([]Document, error)
 	GetDocumentBySlug(slug string) (Document, error)
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
+	DeleteDocument(id string) error
 }
