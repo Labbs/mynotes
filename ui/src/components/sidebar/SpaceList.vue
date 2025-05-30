@@ -228,9 +228,6 @@ onMounted(async () => {
         <button
           @click="toggleSpace(space.id)"
           class="flex flex-1 items-center gap-x-2 rounded-lg px-1 py-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-          :class="{
-            'justify-center': isCollapsed && !isHovered
-          }"
         >
           <div class="relative flex-shrink-0">
             <!-- Space icon (visible by default, hidden on hover) -->
@@ -251,7 +248,6 @@ onMounted(async () => {
 
             <!-- Chevron icon (hidden by default, visible on hover) -->
             <svg
-              v-show="(!isCollapsed || isHovered)"
               class="absolute inset-0 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
               viewBox="0 0 24 24"
               fill="none"
@@ -267,7 +263,6 @@ onMounted(async () => {
           </div>
 
           <span 
-            v-show="!isCollapsed || isHovered"
             class="flex-grow text-left truncate overflow-hidden text-ellipsis"
           >
             {{ capitalizeFirst(space.name) }}
@@ -301,7 +296,7 @@ onMounted(async () => {
 
       <!-- Documents list -->
       <div 
-        v-if="isSpaceExpanded(space.id) && (!isCollapsed || isHovered)"
+        v-if="isSpaceExpanded(space.id)"
         class="ml-2 mt-1"
       >
         <div v-if="documentStore.loadingSpaces.has(space.id)" class="text-[14px] text-gray-500 px-2">
@@ -315,8 +310,6 @@ onMounted(async () => {
           :documents="documentStore.documentsBySpace[space.id].filter(doc => !doc.parent_id || doc.parent_id === '')"
           :space-id="space.id"
           :expanded-document-ids="expandedDocumentIds"
-          :is-collapsed="isCollapsed"
-          :is-hovered="isHovered"
           @toggle-document="toggleDocument"
           @create-document="createDocument"
         />
