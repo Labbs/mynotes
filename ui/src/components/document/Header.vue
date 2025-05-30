@@ -57,7 +57,7 @@ const vFocus: Directive = {
 </script>
 
 <template>
-  <div class="sticky top-0 border-b border-e bg-white">
+  <div class="sticky top-0 border-b border-e border-gray-200 bg-white">
     <div class="flex justify-between items-center h-16 px-8">
       <div class="flex-1" />
       <div v-if="isEditingTitle" class="flex-1">

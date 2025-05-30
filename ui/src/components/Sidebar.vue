@@ -83,7 +83,7 @@ const handleMouseLeave = () => {
     <div
       :style="sidebarStore.isCollapsed && !sidebarStore.isHovering ? { width: '0px', minWidth: '0px' } : sidebarWidth"
       :class="[
-        'flex h-screen flex-col justify-between border-e bg-white transition-all duration-300',
+        'flex h-screen flex-col justify-between border-e border-gray-200 bg-white transition-all duration-300',
         { 'transition-none': isResizing },
       ]"
       @mouseenter="handleMouseEnter"
