@@ -40,11 +40,7 @@ const capitalizeFirst = (str: string) => {
 }
 
 const isDocumentExpanded = (documentId: string) => {
-  const isExpanded = props.expandedDocumentIds.includes(documentId)
-  if (isExpanded && !documentStore.documentsByParent[documentId]) {
-    documentStore.fetchDocumentsByParentDocument(props.spaceId, documentId)
-  }
-  return isExpanded
+  return props.expandedDocumentIds.includes(documentId)
 }
 
 const toggleDocument = (documentId: string, event: Event) => {
