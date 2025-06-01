@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { useSpaceStore } from '../../stores/space'
 import { useDocumentStore } from '../../stores/document'
 import { useRouter, useRoute } from 'vue-router'
 import DocumentList from './DocumentList.vue'
+import CreateMenu from './CreateMenu.vue'
 
-// Use defineProps without assigning to a variable
-const { isCollapsed, isHovered } = defineProps<{
-  isCollapsed: boolean,
-  isHovered: boolean
+// Props pour le composant
+defineProps<{
+  isCollapsed?: boolean,
+  isHovered?: boolean
 }>()
 
 const spaceStore = useSpaceStore()
@@ -16,6 +17,9 @@ const documentStore = useDocumentStore()
 // Utiliser des arrays plutôt que des Set pour éviter les problèmes de typage
 const expandedSpaceIds = ref<string[]>([])
 const expandedDocumentIds = ref<string[]>([])
+const activeCreateMenu = ref<string | null>(null)
+// Ajouter un Set pour suivre les documents survolés
+const hoveredDocIds = ref<Set<string>>(new Set())
 const router = useRouter()
 const route = useRoute()
 const currentSlug = computed(() => route.params.slug as string)
@@ -84,6 +88,19 @@ const capitalizeFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
+// Fonctions pour gérer le hover des documents
+const setHovered = (docId: string, isHovered: boolean) => {
+  if (isHovered) {
+    hoveredDocIds.value.add(docId)
+  } else {
+    hoveredDocIds.value.delete(docId)
+  }
+}
+
+const isDocHovered = (docId: string) => {
+  return hoveredDocIds.value.has(docId)
+}
+
 const isSpaceExpanded = (spaceId: string) => {
   return expandedSpaceIds.value.includes(spaceId)
 }
@@ -112,12 +129,13 @@ const toggleDocument = async (spaceId: string, documentId: string) => {
   }
 }
 
-const createDocument = async (spaceId: string, parentId: string) => {
+const createDocument = async (spaceId: string, parentId: string, type: 'document' | 'database' = 'document') => {
   try {
     const doc = await documentStore.createDocument({
-      name: 'New document',
+      name: `New ${type}`,
       space_id: spaceId,
-      parent_id: parentId
+      parent_id: parentId,
+      type
     })
     
     // Ouvrir le space s'il n'est pas déjà ouvert
@@ -149,8 +167,29 @@ const createDocument = async (spaceId: string, parentId: string) => {
 }
 
 const showSpaceMenu = (spaceId: string) => {
-  console.log('Space menu clicked for space:', spaceId)
+  // Code pour afficher le menu de l'espace
+  console.log('Show space menu for', spaceId)
 }
+
+// Fonction pour gérer la création de différents types de documents
+const handleCreateDocumentType = (spaceId: string, parentId: string, type: 'document' | 'database') => {
+  activeCreateMenu.value = null
+  createDocument(spaceId, parentId, type)
+}
+
+// Fermer le menu si on clique ailleurs dans la page
+const handleDocumentClick = () => {
+  activeCreateMenu.value = null
+}
+
+// Ajouter et supprimer les écouteurs d'événements quand le composant est monté/démonté
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick)
+})
 
 onMounted(async () => {
   await spaceStore.fetchSpaces()
@@ -226,7 +265,7 @@ onMounted(async () => {
     <div v-for="space in spaceStore.spaces" :key="space.id">
       <div class="group flex items-center">
         <button
-          @click="toggleSpace(space.id)"
+          @click.stop.prevent="toggleSpace(space.id)"
           class="flex flex-1 items-center gap-x-2 rounded-lg px-1 py-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
           <div class="relative flex-shrink-0">
@@ -271,17 +310,44 @@ onMounted(async () => {
 
         <!-- Action buttons -->
         <div 
-          v-show="!isCollapsed || isHovered"
-          class="flex gap-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          class="flex gap-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity relative"
         >
           <button
             class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-            @click="createDocument(space.id, '')"
+            @click.stop.prevent="activeCreateMenu === space.id ? activeCreateMenu = null : activeCreateMenu = space.id"
           >
             <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
           </button>
+          
+          <!-- Menu pour créer différents types de documents -->
+          <div 
+            v-if="activeCreateMenu === space.id" 
+            class="absolute z-50 top-full right-0 w-40 bg-white rounded-md shadow-lg py-1 text-sm"
+            @click.stop.prevent
+          >
+            <button 
+              @click.stop.prevent="handleCreateDocumentType(space.id, '', 'document')"
+              class="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              <svg class="w-4 h-4 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Document
+            </button>
+            
+
+            <button 
+              @click.stop.prevent="handleCreateDocumentType(space.id, '', 'database')"
+              class="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              <svg class="w-4 h-4 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
+              Database
+            </button>
+          </div>
           
           <button
             class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
@@ -310,6 +376,7 @@ onMounted(async () => {
           :documents="documentStore.documentsBySpace[space.id].filter(doc => !doc.parent_id || doc.parent_id === '')"
           :space-id="space.id"
           :expanded-document-ids="expandedDocumentIds"
+          :is-hovered="isDocHovered"
           @toggle-document="toggleDocument"
           @create-document="createDocument"
         />
