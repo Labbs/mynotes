@@ -13,7 +13,6 @@ const favoritesStore = useFavoriteStore();
 const currentDocument = computed(() => documentStore.currentDocument)
 const isEditingTitle = ref(false)
 const editableTitle = ref('')
-const saveTimeout = ref<number | null>(null)
 const configSidebarVisible = ref(false)
 
 // Function to update document icon
