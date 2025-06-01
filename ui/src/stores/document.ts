@@ -7,6 +7,7 @@ export const useDocumentStore = defineStore('document', () => {
   const documentsBySpace = ref<Record<string, Document[]>>({})
   const documentsByParent = ref<Record<string, Document[]>>({}) // Pour stocker les sous-documents par parent
   const documentsWithChildren = ref<Set<string>>(new Set()) // Pour stocker les documents qui ont des enfants
+  const listExcalidrawLibs = ref<string[]>([]) // Pour stocker les bibliothèques Excalidraw
   const loadingSpaces = ref<Set<string>>(new Set())
   const loadingDocument = ref(false)
   const error = ref<string | null>(null)
@@ -28,6 +29,7 @@ export const useDocumentStore = defineStore('document', () => {
       console.log('Server response for document:', {
         id: data.id,
         name: data.name,
+        type: data.type,
         hasContent: !!data.content, 
         contentLength: data.content ? data.content.length : 0
       });
@@ -35,11 +37,71 @@ export const useDocumentStore = defineStore('document', () => {
       // Make sure to create a new object to trigger reactivity
       currentDocument.value = { ...data };
       
-      // Force editor update if available
-      if (data.content) {
-        console.log('Document content loaded successfully, length:', data.content.length);
-      } else {
+      // Ensure content is properly initialized based on document type
+      if (data.type === 'excalidraw') {
+        if (!data.content || data.content === 'null') {
+          // Initialize empty Excalidraw content with proper structure
+          currentDocument.value.content = JSON.stringify({ 
+            elements: [], 
+            appState: { 
+              viewBackgroundColor: '#ffffff',
+              currentItemFontFamily: 1,
+              gridSize: 20
+            }, 
+            files: {} 
+          });
+          console.log('Initialized empty Excalidraw content');
+          
+          // Save the initialized content to the server
+          await updateDocument({
+            id: data.id,
+            content: currentDocument.value.content,
+            name: data.name,
+            space_id: data.space_id,
+            config: data.config
+          });
+          console.log('Saved initialized Excalidraw content to server');
+        } else {
+          try {
+            // Validate the existing content format
+            const parsed = JSON.parse(data.content);
+            const isValid = parsed && 
+                          (Array.isArray(parsed.elements)) && 
+                          (typeof parsed.appState === 'object') &&
+                          (typeof parsed.files === 'object');
+            
+            if (!isValid) {
+              // Fix malformed content
+              console.warn('Malformed Excalidraw content detected, fixing structure');
+              currentDocument.value.content = JSON.stringify({ 
+                elements: Array.isArray(parsed?.elements) ? parsed.elements : [], 
+                appState: typeof parsed?.appState === 'object' ? parsed.appState : { 
+                  viewBackgroundColor: '#ffffff',
+                  currentItemFontFamily: 1,
+                  gridSize: 20
+                }, 
+                files: typeof parsed?.files === 'object' ? parsed.files : {} 
+              });
+            }
+          } catch (e) {
+            console.error('Error parsing existing Excalidraw content, resetting:', e);
+            currentDocument.value.content = JSON.stringify({ 
+              elements: [], 
+              appState: { 
+                viewBackgroundColor: '#ffffff',
+                currentItemFontFamily: 1,
+                gridSize: 20
+              }, 
+              files: {} 
+            });
+          }
+        }
+      } else if (!data.content) {
         console.warn('Document loaded without content!');
+        // For non-Excalidraw documents, initialize with empty content
+        currentDocument.value.content = '';
+      } else {
+        console.log('Document content loaded successfully, length:', data.content.length);
       }
     } catch (err) {
       error.value = 'Failed to fetch document';
@@ -127,10 +189,30 @@ export const useDocumentStore = defineStore('document', () => {
 
   async function createDocument(params: CreateDocumentParams) {
     try {
-      const { data } = await documentApi.create(params)
-      return data
+      // Initialize content for Excalidraw documents
+      let initialContent = undefined;
+      if (params.type === 'excalidraw') {
+        // Create proper Excalidraw initial structure with required appState properties
+        initialContent = JSON.stringify({ 
+          elements: [], 
+          appState: { 
+            viewBackgroundColor: '#ffffff',
+            currentItemFontFamily: 1,
+            gridSize: 20
+          }, 
+          files: {} 
+        });
+        console.log('Initializing new Excalidraw document with proper empty content');
+      }
+      
+      const { data } = await documentApi.create({
+        ...params,
+        content: initialContent
+      });
+      
+      return data;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -148,23 +230,29 @@ export const useDocumentStore = defineStore('document', () => {
         config
       });
       
-      // Mise à jour dans la liste des documents
+      // Update document in space list if needed
       if (data.space_id) {
         const spaceId = data.space_id;
         const index = documentsBySpace.value[spaceId]?.findIndex(d => d.id === id);
         if (index !== -1 && documentsBySpace.value[spaceId]) {
-          documentsBySpace.value[spaceId][index] = data;
+          // Only update non-content properties in the space list
+          const { content: _, ...rest } = data;
+          documentsBySpace.value[spaceId][index] = {
+            ...documentsBySpace.value[spaceId][index],
+            ...rest
+          };
         }
       }
       
-      // NE PAS remplacer tout le document actif, juste mettre à jour les propriétés nécessaires
+      // Only update non-content properties for current document to prevent refresh
       if (currentDocument.value && currentDocument.value.id === id) {
-        // Préserver la référence pour éviter un re-rendu complet
-        if (data.slug !== currentDocument.value.slug) {
-          currentDocument.value.slug = data.slug;
-        }
-        // Ne pas mettre à jour le contenu ici si nous sommes en train d'éditer
-        console.log('Store: Document updated with server response');
+        const { content: serverContent, ...otherProps } = data;
+        
+        // Update metadata properties but keep local content
+        Object.assign(currentDocument.value, {
+          ...otherProps,
+          content: currentDocument.value.content // Preserve local content
+        });
       }
       
       return data;
@@ -197,6 +285,17 @@ export const useDocumentStore = defineStore('document', () => {
     }
   }
 
+  // Fetch Excalidraw libraries
+  async function fetchExcalidrawLibs() {
+    try {
+      const { data } = await documentApi.listExcalidrawLibs();
+      listExcalidrawLibs.value = data;
+    } catch (error) {
+      console.error('Error fetching Excalidraw libraries:', error);
+      throw error;
+    }
+  }
+
   return {
     currentDocument,
     documentsBySpace,
@@ -214,6 +313,7 @@ export const useDocumentStore = defineStore('document', () => {
     fetchDocumentById,
     fetchDocumentBySlug,
     fetchDocumentsByParentDocument,
-    deleteDocument
+    deleteDocument,
+    fetchExcalidrawLibs,
   }
 })
