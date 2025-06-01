@@ -1,6 +1,14 @@
 package service
 
-import "github.com/labbs/mynotes/pkg/models"
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"strings"
+
+	"github.com/labbs/mynotes/pkg/config"
+	"github.com/labbs/mynotes/pkg/models"
+)
 
 type documentService struct {
 	documentRepository models.DocumentRepository
@@ -57,4 +65,27 @@ func (s *documentService) DeleteDocument(id string) error {
 		}
 	}
 	return s.documentRepository.DeleteDocument(id)
+}
+
+func (s *documentService) GetExcalidrawLibsList() ([]string, error) {
+	// Ensure the directory exists
+	if _, err := os.Stat(config.Document.ExcalidrawLibsPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(config.Document.ExcalidrawLibsPath, 0755); err != nil {
+			return nil, fmt.Errorf("failed to create excalidraw libraries directory: %w", err)
+		}
+	}
+
+	// List files in the Excalidraw libraries path
+	root := os.DirFS(config.Document.ExcalidrawLibsPath)
+
+	f, err := fs.Glob(root, "*.excalidrawlib")
+	if err != nil {
+		return []string{}, nil // Return empty list instead of error
+	}
+
+	var files []string
+	for _, v := range f {
+		files = append(files, strings.Split(v, ".")[0])
+	}
+	return files, nil
 }
