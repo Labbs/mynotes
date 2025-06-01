@@ -8,5 +8,12 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, '../pkg/app/static/files'),
     emptyOutDir: true
+  },
+  assetsInclude: ['**/*.excalidrawlib'], // Traiter les fichiers .excalidrawlib comme des assets
+  server: {
+    fs: {
+      // Permettre de servir les fichiers en dehors du répertoire racine
+      allow: ['..']
+    }
   }
 })
