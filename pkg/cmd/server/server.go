@@ -35,6 +35,7 @@ func getFlags() (list []cli.Flag) {
 	list = append(list, flags.DatabaseFlags()...)
 	list = append(list, flags.LoggerFlags()...)
 	list = append(list, flags.SessionFlags()...)
+	list = append(list, flags.DocumentFlags()...)
 	return
 }
 
