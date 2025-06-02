@@ -23,4 +23,8 @@ var (
 		Expire    int
 		Issuer    string
 	}
+
+	Document struct {
+		ExcalidrawLibsPath string
+	}
 )

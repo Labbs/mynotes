@@ -71,7 +71,7 @@ func (dc *DocumentController) GetDocumentsFromParentDocument(ctx *fiber.Ctx) err
 // @Param documentId path string true "Document Id"
 // @Success 200 {object} models.Document
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document/{documentId} [get]
+// @Router /api/v1/document/{documentId} [get]
 func (dc *DocumentController) GetDocumentById(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
@@ -95,7 +95,7 @@ func (dc *DocumentController) GetDocumentById(ctx *fiber.Ctx) error {
 // @Param slug path string true "Document Slug"
 // @Success 200 {object} models.Document
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document/slug/{slug} [get]
+// @Router /api/v1/document/slug/{slug} [get]
 func (dc *DocumentController) GetDocumentBySlug(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
@@ -120,7 +120,7 @@ func (dc *DocumentController) GetDocumentBySlug(ctx *fiber.Ctx) error {
 // @Success 201 {object} models.Document
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document [post]
+// @Router /api/v1/document [post]
 func (dc *DocumentController) CreateDocument(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.create").Logger()
 
@@ -151,7 +151,7 @@ func (dc *DocumentController) CreateDocument(ctx *fiber.Ctx) error {
 // @Success 200 {object} models.Document
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document/{documentId} [put]
+// @Router /api/v1/document/{documentId} [put]
 func (dc *DocumentController) UpdateDocument(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.update").Logger()
 
@@ -200,7 +200,7 @@ func (dc *DocumentController) UpdateDocument(ctx *fiber.Ctx) error {
 // @Param documentId path string true "Document Id"
 // @Success 204
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document/{documentId} [delete]
+// @Router /api/v1/document/{documentId} [delete]
 func (dc *DocumentController) DeleteDocument(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.delete").Logger()
 
@@ -213,4 +213,27 @@ func (dc *DocumentController) DeleteDocument(ctx *fiber.Ctx) error {
 
 	logger.Debug().Str("document", documentId).Msg("Document deleted successfully")
 	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
+// ListLibsExcalidraw godoc
+// @Summary List Excalidraw libraries
+// @Description List Excalidraw libraries
+// @Tags document
+// @Accept json
+// @Produce json
+// @Success 200 {array} []string
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/v1/document/excalidraw/libs [get]
+func (dc *DocumentController) ListLibsExcalidraw(ctx *fiber.Ctx) error {
+	logger := dc.Logger.With().Str("event", "api.documents.excalidraw.libs").Logger()
+
+	// list libraries from the configured path
+	libs, err := dc.DocumentService.GetExcalidrawLibsList()
+	if err != nil {
+		logger.Error().Err(err).Msg("Error listing Excalidraw libraries")
+		return ctx.Status(fiber.StatusInternalServerError).JSON([]string{})
+	}
+
+	logger.Debug().Msg("Excalidraw libraries listed successfully")
+	return ctx.Status(fiber.StatusOK).JSON(libs)
 }

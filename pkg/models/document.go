@@ -149,4 +149,5 @@ type DocumentService interface {
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
 	DeleteDocument(id string) error
+	GetExcalidrawLibsList() ([]string, error)
 }

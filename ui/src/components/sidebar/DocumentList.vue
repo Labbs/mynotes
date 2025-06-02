@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useDocumentStore } from '../../stores/document'
 import { useRoute } from 'vue-router'
+import CreateMenu from './CreateMenu.vue'
 
 const props = defineProps<{
   documents: any[]
   spaceId: string
   expandedDocumentIds: string[]
+  isHovered?: (docId: string) => boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'toggleDocument', spaceId: string, documentId: string): void
-  (e: 'createDocument', spaceId: string, parentId: string): void
+  (e: 'createDocument', spaceId: string, parentId: string, type?: 'document' | 'database'): void
 }>()
 
 const documentStore = useDocumentStore()
@@ -20,6 +22,8 @@ const currentSlug = computed(() => route.params.slug as string)
 
 // Garder une trace des documents qui sont survolés
 const hoveredDocIds = ref<Set<string>>(new Set())
+// Variable pour suivre quel menu de création est actuellement ouvert
+const activeCreateMenu = ref<string | null>(null)
 
 // Fonctions pour gérer le hover
 const setHovered = (docId: string, isHovered: boolean) => {
@@ -31,6 +35,10 @@ const setHovered = (docId: string, isHovered: boolean) => {
 }
 
 const isHovered = (docId: string) => {
+  // Utiliser la fonction isHovered du parent si elle est passée en prop
+  if (props.isHovered) {
+    return props.isHovered(docId)
+  }
   return hoveredDocIds.value.has(docId)
 }
 
@@ -51,13 +59,33 @@ const toggleDocument = (documentId: string, event: Event) => {
   emit('toggleDocument', props.spaceId, documentId)
 }
 
-const createDocument = (parentId: string, event: Event) => {
+const createDocument = (parentId: string, type: 'document' | 'database' = 'document', event?: Event) => {
   if (event) {
     event.preventDefault()
     event.stopPropagation()
   }
-  emit('createDocument', props.spaceId, parentId)
+  activeCreateMenu.value = null
+  emit('createDocument', props.spaceId, parentId, type)
 }
+
+// Fonction pour gérer la sélection dans le menu contextuel
+const handleCreateDocumentType = (parentId: string, type: 'document' | 'database') => {
+  createDocument(parentId, type)
+}
+
+// Ferme le menu si on clique ailleurs
+const handleOutsideClick = () => {
+  activeCreateMenu.value = null
+}
+
+onMounted(() => {
+  // Add event listener to close document menus when clicking outside
+  document.addEventListener("click", handleOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleOutsideClick);
+});
 </script>
 
 <template>
@@ -100,39 +128,45 @@ const createDocument = (parentId: string, event: Event) => {
           :class="{ 
             'bg-blue-50 text-blue-600 font-medium': doc.slug === currentSlug,
           }"
+          @click.stop
         >
           <div class="flex-shrink-0" v-show="!hoveredDocIds.has(doc.id)">
             <!-- Document icon -->
-            <div v-if="!doc.config.icon"
+            <div v-if="!doc.config?.icon"
               class="size-4 rounded bg-gray-100 flex items-center justify-center opacity-75 text-xs font-medium"
               :class="{ 'bg-blue-100': doc.slug === currentSlug }"
             >
               {{ doc.name?.[0]?.toUpperCase() }}
             </div>
-            <div v-else>
+            <div v-else-if="doc.config?.icon">
               {{ doc.config.icon }}
             </div>
           </div>
           <span class="truncate overflow-hidden text-ellipsis block min-w-0 flex-grow">
-            {{ capitalizeFirst(doc.name) }}
+            {{ capitalizeFirst(doc.name || 'Untitled') }}
           </span>
         </router-link>
         
         <!-- Action buttons pour document (en position absolue) -->
         <div 
-          v-if="isHovered"
           class="absolute right-1 flex items-center h-full transition-opacity"
-          :class="{ 'opacity-100': isHovered(doc.id), 'opacity-0': !isHovered(doc.id) }"
+          :class="{ 'opacity-100': hoveredDocIds.has(doc.id), 'opacity-0': !hoveredDocIds.has(doc.id) }"
         >
           <button
             class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 bg-white bg-opacity-90 shadow-sm"
-            @click="(e) => createDocument(doc.id, e)"
+            @click.stop.prevent="activeCreateMenu === doc.id ? activeCreateMenu = null : activeCreateMenu = doc.id"
             title="Create sub-document"
           >
             <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
           </button>
+          
+          <!-- Menu pour créer différents types de documents -->
+          <CreateMenu 
+            v-if="activeCreateMenu === doc.id"
+            @select="(type) => handleCreateDocumentType(doc.id, type)"
+          />
         </div>
       </div>
       
@@ -151,7 +185,7 @@ const createDocument = (parentId: string, event: Event) => {
           :expanded-document-ids="expandedDocumentIds"
           :is-hovered="isHovered"
           @toggle-document="(spaceId, docId) => $emit('toggleDocument', spaceId, docId)"
-          @create-document="(spaceId, parentId) => $emit('createDocument', spaceId, parentId)"
+          @create-document="(spaceId, parentId, type) => $emit('createDocument', spaceId, parentId, type)"
         />
       </div>
     </div>
