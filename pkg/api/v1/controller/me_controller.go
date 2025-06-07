@@ -27,7 +27,7 @@ func (mc *MeController) GetMySpaces(ctx *fiber.Ctx) error {
 	logger := mc.Logger.With().Str("event", "api.spaces.get").Logger()
 
 	userId := ctx.Locals("user_id").(string)
-	groups, err := mc.UserService.GetGroups(userId)
+	groups, err := mc.UserService.GetGroupsByUserId(userId)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting user groups")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
