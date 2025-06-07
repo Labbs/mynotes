@@ -23,7 +23,7 @@ func (s *groupService) GetGroupById(id string) (models.Group, error) {
 
 // GetGroupWithUsers returns a group with users
 func (s *groupService) GetGroupWithUsers(id string) (models.Group, error) {
-	return s.groupRepository.GetWithUsers(id)
+	return s.groupRepository.GetGroupWithUsers(id)
 }
 
 // GetAllGroups returns all groups
