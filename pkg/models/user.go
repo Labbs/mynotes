@@ -48,7 +48,9 @@ type UserRepository interface {
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
-	GetGroups(userId string) ([]Group, error)
+	GetGroupsByUserId(userId string) ([]Group, error)
+	GetAllUsers() ([]User, error)
+	GetAllInactiveUsers() ([]User, error)
 }
 
 // UserService defines the methods that a user service should implement.
@@ -59,5 +61,7 @@ type UserService interface {
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
-	GetGroups(userId string) ([]Group, error)
+	GetGroupsByUserId(userId string) ([]Group, error)
+	GetAllUsers() ([]User, error)
+	GetAllInactiveUsers() ([]User, error)
 }
