@@ -27,8 +27,8 @@ func (r *groupRepository) GetById(id string) (models.Group, error) {
 	return group, nil
 }
 
-// GetWithUsers returns a group with users
-func (r *groupRepository) GetWithUsers(id string) (models.Group, error) {
+// GetGroupWithUsers returns a group with users
+func (r *groupRepository) GetGroupWithUsers(id string) (models.Group, error) {
 	var group models.Group
 	if err := r.db.Preload("Users").Where("id = ?", id).First(&group).Error; err != nil {
 		return models.Group{}, err
