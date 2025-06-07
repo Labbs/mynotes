@@ -1,13 +1,14 @@
 package router
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/labbs/mynotes/pkg/api/controller"
 	"github.com/labbs/mynotes/pkg/api/middleware"
 	"github.com/labbs/mynotes/pkg/repository"
 	"github.com/labbs/mynotes/pkg/service"
 )
 
-func NewAuthRouter(config *Config) {
+func NewAuthRouter(config *Config, rbacMiddleware fiber.Handler) {
 	// Set up the auth routes
 	config.Logger.Info().Msg("Setting up auth routes")
 
@@ -42,6 +43,6 @@ func NewAuthRouter(config *Config) {
 	// to all routes in this group
 	// this is used to protect the logout route
 	// and require the user to be authenticated
-	authPrivate := config.Fiber.Group("/api/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), middleware.RBACCheckMiddleware(config.Logger))
+	authPrivate := config.Fiber.Group("/api/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), rbacMiddleware)
 	authPrivate.Post("/logout", c.Logout)
 }
