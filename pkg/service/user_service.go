@@ -36,6 +36,14 @@ func (s *userService) Delete(id string) error {
 	return s.userRepository.Delete(id)
 }
 
-func (s *userService) GetGroups(userId string) ([]models.Group, error) {
-	return s.userRepository.GetGroups(userId)
+func (s *userService) GetGroupsByUserId(userId string) ([]models.Group, error) {
+	return s.userRepository.GetGroupsByUserId(userId)
+}
+
+func (s *userService) GetAllUsers() ([]models.User, error) {
+	return s.userRepository.GetAllUsers()
+}
+
+func (s *userService) GetAllInactiveUsers() ([]models.User, error) {
+	return s.userRepository.GetAllInactiveUsers()
 }
