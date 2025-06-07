@@ -75,18 +75,37 @@ func (r *userRepository) Create(user *models.User) error {
 }
 
 // Update updates a user
+// It takes a user pointer as a parameter and returns the updated user and an error.
 func (r *userRepository) Update(user *models.User) (models.User, error) {
 	return *user, r.db.Debug().Save(user).Error
 }
 
 // Delete deletes a user
+// It takes an id string as a parameter and returns an error.
 func (r *userRepository) Delete(id string) error {
 	return r.db.Debug().Where("id = ?", id).Delete(&models.User{}).Error
 }
 
 // GetGroups returns the groups of a user
-func (r *userRepository) GetGroups(id string) ([]models.Group, error) {
+// It retrieves the groups associated with a user by their ID.
+func (r *userRepository) GetGroupsByUserId(id string) ([]models.Group, error) {
 	var groups []models.Group
 	err := r.db.Debug().Unscoped().Table("user_group").Select("user_id, group_id").Where("user_id = ?", id).Find(&groups).Error
 	return groups, err
+}
+
+// GetAllUsers returns all users
+// It retrieves all active users from the database, selecting only the id, name, email, and avatar_url fields.
+func (r *userRepository) GetAllUsers() ([]models.User, error) {
+	var users []models.User
+	err := r.db.Debug().Select("id, name, email, avatar_url").Where("active = true").Find(&users).Error
+	return users, err
+}
+
+// GetAllInactiveUsers returns all inactive users
+// It retrieves all inactive users from the database, selecting only the id, name, email, and avatar_url fields.
+func (r *userRepository) GetAllInactiveUsers() ([]models.User, error) {
+	var users []models.User
+	err := r.db.Debug().Select("id, name, email, avatar_url").Where("active = false").Find(&users).Error
+	return users, err
 }
