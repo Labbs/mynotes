@@ -80,3 +80,26 @@ func IsAuthorized(token string) (bool, error) {
 
 	return true, nil
 }
+
+// IsPasswordComplex checks if the password meets complexity requirements.
+func IsPasswordComplex(password string) bool {
+	hasUpper := false
+	hasLower := false
+	hasNumber := false
+	hasSymbol := false
+
+	for _, char := range password {
+		switch {
+		case char >= 'A' && char <= 'Z':
+			hasUpper = true
+		case char >= 'a' && char <= 'z':
+			hasLower = true
+		case char >= '0' && char <= '9':
+			hasNumber = true
+		case (char >= '!' && char <= '/') || (char >= ':' && char <= '@') || (char >= '[' && char <= '`') || (char >= '{' && char <= '~'):
+			hasSymbol = true
+		}
+	}
+
+	return hasUpper && hasLower && hasNumber && hasSymbol
+}
