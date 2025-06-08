@@ -62,6 +62,13 @@ func (mc *MeController) GetMyProfile(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
 	}
 
+	// check if is_admin is set in context
+	if ctx.Locals("is_admin") != nil {
+		if ctx.Locals("is_admin").(bool) {
+			user.IsAdmin = true
+		}
+	}
+
 	user.Password = ""
 	logger.Debug().Str("user", userId).Msg("User profile retrieved successfully")
 	return ctx.Status(fiber.StatusOK).JSON(user)
