@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { documentApi, type Document, type CreateDocumentParams, type Config } from '../api/document'
+import { documentApi, type CreateDocumentParams } from '../api/document'
+import type { Document, Config } from '../api/interface'
 
 export const useDocumentStore = defineStore('document', () => {
   const currentDocument = ref<Document | null>(null)

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { spaceApi, type Space } from '../api/space'
+import { spaceApi } from '../api/space'
+import type { Space } from '../api/interface'
 
 interface SpaceState {
   spaces: Space[]
