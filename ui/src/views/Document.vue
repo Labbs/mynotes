@@ -166,7 +166,7 @@ const saveDocument = async (content: string) => {
 </script>
 
 <template>
-  <main class="flex-1 flex flex-col overflow-hidden">
+  <main class="flex-1 flex flex-col overflow-hidden bg-white">
     <!-- Afficher un indicateur de chargement -->
     <div v-if="documentStore.loadingDocument" class="flex justify-center items-center h-screen">
       <div class="animate-pulse text-xl text-gray-500">Loading the document</div>
