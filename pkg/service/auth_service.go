@@ -63,7 +63,7 @@ func (s *authService) Register(request models.RegisterRequest) (models.RegisterR
 	}
 
 	emailDomain := strings.Split(request.Email, "@")[1]
-	if !slices.Contains(config.Registration.DomainWhitelist.Value(), emailDomain) {
+	if !slices.Contains(config.Registration.DomainWhitelist.Value(), emailDomain) && len(config.Registration.DomainWhitelist.Value()) > 0 {
 		return models.RegisterResponse{}, fmt.Errorf("email domain %s is not allowed for registration", emailDomain)
 	}
 
