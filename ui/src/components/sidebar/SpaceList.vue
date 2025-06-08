@@ -4,7 +4,6 @@ import { useSpaceStore } from '../../stores/space'
 import { useDocumentStore } from '../../stores/document'
 import { useRouter, useRoute } from 'vue-router'
 import DocumentList from './DocumentList.vue'
-import CreateMenu from './CreateMenu.vue'
 
 // Props pour le composant
 defineProps<{
@@ -89,13 +88,13 @@ const capitalizeFirst = (str: string) => {
 }
 
 // Fonctions pour gérer le hover des documents
-const setHovered = (docId: string, isHovered: boolean) => {
-  if (isHovered) {
-    hoveredDocIds.value.add(docId)
-  } else {
-    hoveredDocIds.value.delete(docId)
-  }
-}
+// const setHovered = (docId: string, isHovered: boolean) => {
+//   if (isHovered) {
+//     hoveredDocIds.value.add(docId)
+//   } else {
+//     hoveredDocIds.value.delete(docId)
+//   }
+// }
 
 const isDocHovered = (docId: string) => {
   return hoveredDocIds.value.has(docId)
