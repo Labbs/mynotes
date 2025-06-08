@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { type Document } from '../../api/document';
+import { type Document } from '../../api/interface';
 import { useDocumentStore } from '../../stores/document';
 
 const documentStore = useDocumentStore();
@@ -90,7 +90,7 @@ const deleteDocument = (documentId: string) => {
           // move to home page
           window.location.href = '/';
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Error deleting document:', error);
           alert('Failed to delete document. Please try again later.');
         });
