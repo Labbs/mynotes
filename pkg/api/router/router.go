@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/api/middleware"
+	"github.com/labbs/mynotes/pkg/api/middleware/rbac"
 	"github.com/labbs/mynotes/pkg/repository"
 	"github.com/labbs/mynotes/pkg/service"
 	"github.com/rs/zerolog"
@@ -21,15 +21,15 @@ func (c *Config) Setup() {
 	ssr := repository.NewSpaceRepository(c.Db)
 	dr := repository.NewDocumentRepository(c.Db)
 
-	rbacMiddleware := middleware.RBACCheckMiddleware(
-		c.Logger,
-		service.NewUserService(ur),
-		service.NewGroupService(gr),
-		service.NewSpaceService(ssr),
-		service.NewDocumentService(dr),
-	)
+	crbac := rbac.Config{
+		Logger:          c.Logger,
+		UserService:     service.NewUserService(ur),
+		GroupService:    service.NewGroupService(gr),
+		SpaceService:    service.NewSpaceService(ssr),
+		DocumentService: service.NewDocumentService(dr),
+	}
 
-	NewAuthRouter(c, rbacMiddleware)
-	NewMeRouter(c, rbacMiddleware)
-	NewDocumentRouter(c, rbacMiddleware)
+	NewAuthRouter(c, crbac.Check())
+	NewMeRouter(c, crbac.Check())
+	NewDocumentRouter(c, crbac.Check())
 }
