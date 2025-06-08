@@ -1,5 +1,7 @@
 package config
 
+import "github.com/urfave/cli/v2"
+
 var (
 	DevMode bool
 
@@ -42,5 +44,13 @@ var (
 		}
 
 		Enable bool // Enable or disable caching
+	}
+
+	Registration struct {
+		Enabled                  bool            // Enable or disable user registration
+		RequireEmailVerification bool            // Require email verification for new registrations
+		DomainWhitelist          cli.StringSlice // List of allowed domains for registration
+		PasswordMinLength        int             // Minimum password length for registration
+		PasswordComplexity       bool            // Require complex passwords (uppercase, lowercase, numbers, symbols)
 	}
 )
