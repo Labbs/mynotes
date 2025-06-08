@@ -81,7 +81,7 @@ const toggleEditorEditable = () => {
 };
 
 const favorite = async () => {
-  if (favoritesStore.favorites.some(f => f.document?.id === currentDocument.value?.id)) {
+  if (favoritesStore.favorites.some((f: any) => f.document?.id === currentDocument.value?.id)) {
     await favoritesStore.unFavorite(currentDocument.value?.id as string);
   } else {
     await favoritesStore.addFavorite(currentDocument.value?.id as string);
