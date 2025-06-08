@@ -127,3 +127,13 @@ func (r *userRepository) GetPreferencesById(id string) (models.JSONB, error) {
 func (r *userRepository) UpdatePreferences(id string, preferences models.JSONB) error {
 	return r.db.Debug().Model(&models.User{}).Where("id = ?", id).Update("preferences", preferences).Error
 }
+
+// GetByIdWithGroups retrieves a user by their ID, including their groups.
+func (r *userRepository) GetUserWithGroups(id string) (models.User, error) {
+	var user models.User
+	err := r.db.Debug().Preload("Groups").Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}
