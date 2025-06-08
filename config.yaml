@@ -1,0 +1,42 @@
+dev-mode: true
+
+logger:
+  level: "debug" # Options: debug, info, warn, error, fatal
+  pretty: true
+
+http:
+  port: 8080
+  http_logs: true
+
+# Database settings
+database:
+  dialect: sqlite # Options: sqlite, postgres
+  dsn: "./database.db"
+
+# Cache settings
+caching:
+  enabled: true
+  type: memory # Options: memory, redis
+  expire: 3600 # Cache expiration time in seconds
+
+  # redis:
+  #   addr: "localhost:6379"
+  #   password: ""
+  #   db: 0
+
+  memory:
+    size: 100 # Maximum number of items in memory cache
+
+# Session settings
+session:
+  secret-key: "mynotes-secret-key" # Secret key for session encryption
+  issuer: "mynotes" # Issuer for JWT tokens
+  expire: 604800 # 7 days in seconds
+
+# Registration settings
+registration:
+  enabled: false
+  require-email-verification: false
+  domain-whitelist: []
+  password-min-length: 12
+  password-complexity: true
