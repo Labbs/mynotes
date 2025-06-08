@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Directive, ref } from 'vue';
 import { useFavoriteStore } from '../../stores/favorite';
-import { type Document } from '../../api/document';
+import { type Document } from '../../api/interface';
 import { AdjustmentsHorizontalIcon } from "@heroicons/vue/24/solid";
 import ConfigSidebar from './ConfigSidebar.vue';
 
