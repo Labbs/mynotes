@@ -30,16 +30,23 @@ func (c *Config) Check() fiber.Handler {
 			})
 		}
 
+		var isAdmin bool = false
+
 		// check if one of the groups is an admin group
 		for _, group := range groups {
 			if group.Role == models.RoleAdmin {
 				ctx.Context().SetUserValue("is_admin", true)
-				// return ctx.Next()
+				return ctx.Next()
 			}
 		}
 
 		// check if the path
-		fmt.Println("DEBUGGGGGGG: Checking RBAC for path:", ctx.Path())
+		if strings.HasPrefix(ctx.Path(), "/api/v1/admin") && !isAdmin {
+			_logger.Error().Str("event", "middleware.rbac_check_middleware.not_authorized").Msg("User is not authorized to access admin routes")
+			return ctx.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error": "You are not authorized to access this resource",
+			})
+		}
 
 		return ctx.Next()
 	}
