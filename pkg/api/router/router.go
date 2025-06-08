@@ -32,4 +32,5 @@ func (c *Config) Setup() {
 	NewAuthRouter(c, crbac.Check())
 	NewMeRouter(c, crbac.Check())
 	NewDocumentRouter(c, crbac.Check())
+	NewAdminRouter(c, crbac.Check())
 }
