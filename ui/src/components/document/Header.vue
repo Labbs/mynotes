@@ -94,7 +94,7 @@ const vFocus: Directive = {
           class="text-gray-400 hover:text-yellow-500 transition-colors p-2 rounded-lg hover:bg-gray-100"
           @click="emit('favorite')"
           :class="{
-            'text-yellow-500': favoritesStore.favorites.some(f => f.document?.id === currentDocument?.id)
+            'text-yellow-500': favoritesStore.favorites.some((f: any) => f.document?.id === currentDocument?.id)
           }"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
