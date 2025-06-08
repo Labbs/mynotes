@@ -23,7 +23,7 @@ func NewInstance() *cli.Command {
 		Name:   "server",
 		Usage:  "Start the server",
 		Flags:  serverFlags,
-		Before: altsrc.InitInputSourceWithContext(serverFlags, altsrc.NewJSONSourceFromFlagFunc("config")),
+		Before: altsrc.InitInputSourceWithContext(serverFlags, altsrc.NewYamlSourceFromFlagFunc("config")),
 		Action: runServer,
 	}
 }
