@@ -39,4 +39,6 @@ func NewMeRouter(config *Config, rbacMiddleware fiber.Handler) {
 	v1Me.Get("/spaces", c.GetMySpaces)
 	v1Me.Post("/favorites/:documentId", c.AddFavorite)
 	v1Me.Delete("/favorites/:documentId", c.UnFavorite)
+	v1Me.Get("/preferences", c.GetMyPreferences)
+	v1Me.Put("/preferences", c.UpdateMyPreferences)
 }
