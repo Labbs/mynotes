@@ -21,6 +21,8 @@ type User struct {
 
 	Groups []Group `json:"groups" gorm:"many2many:user_group;"`
 
+	IsAdmin bool `json:"is_admin,omitempty" gorm:"-"`
+
 	Favorites []Favorite `json:"favorites"`
 
 	CreatedAt time.Time `json:"created_at"`
@@ -53,6 +55,7 @@ type UserRepository interface {
 	GetGroupsByUserId(userId string) ([]Group, error)
 	GetAllUsers() ([]User, error)
 	GetAllInactiveUsers() ([]User, error)
+	GetUserWithGroups(id string) (User, error)
 }
 
 // UserService defines the methods that a user service should implement.
@@ -68,4 +71,5 @@ type UserService interface {
 	GetAllUsers() ([]User, error)
 	GetAllInactiveUsers() ([]User, error)
 	UpdatePreferences(id string, preferences JSONB) error
+	GetUserWithGroups(id string) (User, error)
 }
