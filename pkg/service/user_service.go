@@ -47,3 +47,11 @@ func (s *userService) GetAllUsers() ([]models.User, error) {
 func (s *userService) GetAllInactiveUsers() ([]models.User, error) {
 	return s.userRepository.GetAllInactiveUsers()
 }
+
+func (s *userService) GetPreferencesById(id string) (models.JSONB, error) {
+	return s.userRepository.GetPreferencesById(id)
+}
+
+func (s *userService) UpdatePreferences(id string, preferences models.JSONB) error {
+	return s.userRepository.UpdatePreferences(id, preferences)
+}

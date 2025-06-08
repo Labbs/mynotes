@@ -45,6 +45,8 @@ type UserRepository interface {
 	GetByEmailOrUsername(emailOrUsername string) (User, error)
 	GetByEmail(email string) (User, error)
 	GetById(id string) (User, error)
+	GetPreferencesById(id string) (JSONB, error)
+	UpdatePreferences(id string, preferences JSONB) error
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
@@ -58,10 +60,12 @@ type UserService interface {
 	GetByEmailOrUsername(emailOrUsername string) (User, error)
 	GetByEmail(email string) (User, error)
 	GetById(id string) (User, error)
+	GetPreferencesById(id string) (JSONB, error)
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
 	GetGroupsByUserId(userId string) ([]Group, error)
 	GetAllUsers() ([]User, error)
 	GetAllInactiveUsers() ([]User, error)
+	UpdatePreferences(id string, preferences JSONB) error
 }

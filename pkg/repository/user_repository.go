@@ -56,7 +56,7 @@ func (r *userRepository) GetByEmail(email string) (models.User, error) {
 // The error is nil if the user is found, otherwise it contains the error message.
 func (r *userRepository) GetById(id string) (models.User, error) {
 	var user models.User
-	err := r.db.Debug().Where("id = ?", id).First(&user).Error
+	err := r.db.Debug().Select("id, name, email, avatar_url, created_at, updated_at").Where("id = ?", id).First(&user).Error
 	return user, err
 }
 
@@ -90,7 +90,10 @@ func (r *userRepository) Delete(id string) error {
 // It retrieves the groups associated with a user by their ID.
 func (r *userRepository) GetGroupsByUserId(id string) ([]models.Group, error) {
 	var groups []models.Group
-	err := r.db.Debug().Unscoped().Table("user_group").Select("user_id, group_id").Where("user_id = ?", id).Find(&groups).Error
+	err := r.db.Debug().Unscoped().Table("group").Select("id", "role").
+		Joins("JOIN user_group ON user_group.group_id = id").
+		Where("user_group.user_id = ?", id).
+		Find(&groups).Error
 	return groups, err
 }
 
@@ -108,4 +111,19 @@ func (r *userRepository) GetAllInactiveUsers() ([]models.User, error) {
 	var users []models.User
 	err := r.db.Debug().Select("id, name, email, avatar_url").Where("active = false").Find(&users).Error
 	return users, err
+}
+
+// GetPreferencesById retrieves the preferences of a user by their ID.
+func (r *userRepository) GetPreferencesById(id string) (models.JSONB, error) {
+	var user models.User
+	err := r.db.Debug().Select("preferences").Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return models.JSONB{}, err
+	}
+	return user.Preferences, nil
+}
+
+// UpdatePreferences updates the preferences of a user by their ID.
+func (r *userRepository) UpdatePreferences(id string, preferences models.JSONB) error {
+	return r.db.Debug().Model(&models.User{}).Where("id = ?", id).Update("preferences", preferences).Error
 }
