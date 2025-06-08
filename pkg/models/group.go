@@ -15,9 +15,8 @@ type Group struct {
 
 	Users []User `json:"users" gorm:"many2many:user_group;"`
 
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (g Group) TableName() string {
