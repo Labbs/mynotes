@@ -50,6 +50,8 @@ export interface Document {
   slug?: string
   // properties: Property[]
   config: Config
+  public?: boolean
+  members?: Member[]
   content?: string
   created_at?: string
   updated_at?: string
