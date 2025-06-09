@@ -48,6 +48,7 @@ type GroupRepository interface {
 	GetAll() ([]Group, error)
 	Update(group Group) (Group, error)
 	Delete(id string) error
+	GetAllGroupsWithUsers() ([]Group, error)
 }
 
 // GroupService is the service for groups
@@ -58,4 +59,5 @@ type GroupService interface {
 	GetAllGroups() ([]Group, error)
 	UpdateGroup(group Group) (Group, error)
 	DeleteGroup(id string) error
+	GetAllGroupsWithUsers() ([]Group, error)
 }
