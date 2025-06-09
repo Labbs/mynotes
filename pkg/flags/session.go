@@ -15,7 +15,7 @@ func SessionFlags() []cli.Flag {
 			Aliases:     []string{"ssk"},
 			EnvVars:     []string{"SESSION_SECRET_KEY"},
 			Usage:       "Session secret key",
-			Value:       "monit",
+			Value:       "mynotes-secret-key",
 			Destination: &config.Session.SecretKey,
 		}),
 		altsrc.NewIntFlag(&cli.IntFlag{
@@ -31,7 +31,7 @@ func SessionFlags() []cli.Flag {
 			Aliases:     []string{"si"},
 			EnvVars:     []string{"SESSION_ISSUER"},
 			Usage:       "Session issuer",
-			Value:       "monit",
+			Value:       "mynotes",
 			Destination: &config.Session.Issuer,
 		}),
 	}

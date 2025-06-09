@@ -5,6 +5,7 @@ import { useSpaceStore } from "../stores/space";
 import { useSidebarStore } from "../stores/sidebar";
 import { useAuthStore } from "../stores/auth";
 import { useFavoriteStore } from "../stores/favorite";
+import { usePreferencesStore } from "../stores/preferences";
 
 import Header from "./sidebar/Header.vue";
 import CommonMenu from "./sidebar/CommonMenu.vue";
@@ -16,8 +17,16 @@ const spaceStore = useSpaceStore();
 const sidebarStore = useSidebarStore();
 const authStore = useAuthStore();
 const favoritesStore = useFavoriteStore();
+const preferencesStore = usePreferencesStore();
 
-onMounted(() => {
+onMounted(async () => {
+  // Charger d'abord les préférences si l'utilisateur est connecté
+  if (authStore.isAuthenticated) {
+    await preferencesStore.loadPreferences();
+    // Puis initialiser le sidebar avec les préférences
+    sidebarStore.initializeFromPreferences();
+  }
+  
   spaceStore.fetchSpaces();
   favoritesStore.fetchFavorites();
 });
@@ -179,7 +188,7 @@ const handleMouseLeave = () => {
     <!-- Resizer -->
     <div
       v-show="!sidebarStore.isCollapsed || sidebarStore.isHovering"
-      class="w-1 hover:w-2 bg-transparent hover:bg-gray-200 cursor-col-resize transition-all"
+      class="w-[1px] hover:w-2 bg-gray-200 hover:bg-gray-200 cursor-col-resize transition-all"
       @mousedown.prevent="startResize"
     />
   </div>

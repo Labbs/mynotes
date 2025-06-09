@@ -1,21 +1,31 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { usePreferencesStore } from './preferences'
 
 export const useSidebarStore = defineStore('sidebar', () => {
   const MIN_WIDTH = 150 // 16rem (w-64)
   const MAX_WIDTH = 600
-  const isCollapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true')
-  const width = ref(parseInt(localStorage.getItem('sidebarWidth') || String(MIN_WIDTH)))
+  const preferencesStore = usePreferencesStore()
+  
+  const isCollapsed = ref(false)
+  const width = ref(MIN_WIDTH)
   const isHovering = ref(false)
+
+  // Initialiser les valeurs depuis les préférences
+  function initializeFromPreferences() {
+    isCollapsed.value = preferencesStore.preferences.ui.sidebarCollapsed
+    width.value = preferencesStore.preferences.ui.sidebarWidth
+  }
 
   function toggleCollapse() {
     isCollapsed.value = !isCollapsed.value
-    localStorage.setItem('sidebarCollapsed', isCollapsed.value.toString())
+    preferencesStore.updatePreference('sidebarCollapsed', isCollapsed.value)
   }
 
   function setWidth(newWidth: number) {
-    width.value = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, newWidth))
-    localStorage.setItem('sidebarWidth', width.value.toString())
+    const clampedWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, newWidth))
+    width.value = clampedWidth
+    preferencesStore.updatePreference('sidebarWidth', clampedWidth)
   }
   
   function setHovering(value: boolean) {
@@ -24,12 +34,12 @@ export const useSidebarStore = defineStore('sidebar', () => {
   
   function collapse() {
     isCollapsed.value = true
-    localStorage.setItem('sidebarCollapsed', 'true')
+    preferencesStore.updatePreference('sidebarCollapsed', true)
   }
   
   function expand() {
     isCollapsed.value = false
-    localStorage.setItem('sidebarCollapsed', 'false')
+    preferencesStore.updatePreference('sidebarCollapsed', false)
   }
 
   return {
@@ -42,6 +52,7 @@ export const useSidebarStore = defineStore('sidebar', () => {
     setHovering,
     collapse,
     expand,
-    setWidth
+    setWidth,
+    initializeFromPreferences
   }
 }) 

@@ -11,6 +11,7 @@ require (
 	github.com/gosimple/slug v1.15.0
 	github.com/lithammer/shortuuid/v4 v4.2.0
 	github.com/pressly/goose/v3 v3.24.3
+	github.com/redis/go-redis/v9 v9.9.0
 	github.com/rs/zerolog v1.33.0
 	github.com/urfave/cli/v2 v2.27.4
 	golang.org/x/crypto v0.38.0
@@ -24,7 +25,9 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-sql-driver/mysql v1.9.2 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

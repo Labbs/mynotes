@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/labbs/mynotes/internal/database"
+	"github.com/labbs/mynotes/pkg/caching"
 	"github.com/labbs/mynotes/pkg/config"
 	"github.com/labbs/mynotes/pkg/flags"
 	htserver "github.com/labbs/mynotes/pkg/httpserver"
@@ -22,7 +23,7 @@ func NewInstance() *cli.Command {
 		Name:   "server",
 		Usage:  "Start the server",
 		Flags:  serverFlags,
-		Before: altsrc.InitInputSourceWithContext(serverFlags, altsrc.NewJSONSourceFromFlagFunc("config")),
+		Before: altsrc.InitInputSourceWithContext(serverFlags, altsrc.NewYamlSourceFromFlagFunc("config")),
 		Action: runServer,
 	}
 }
@@ -36,6 +37,8 @@ func getFlags() (list []cli.Flag) {
 	list = append(list, flags.LoggerFlags()...)
 	list = append(list, flags.SessionFlags()...)
 	list = append(list, flags.DocumentFlags()...)
+	list = append(list, flags.CachingFlags()...)
+	list = append(list, flags.RegistrationFlags()...)
 	return
 }
 
@@ -46,6 +49,14 @@ func runServer(c *cli.Context) error {
 	l := logger.NewLogger(config.Logger.Level, config.Logger.Pretty, c.App.Version)
 
 	db := database.NewGorm(l, config.Database.Dialect, config.Database.DSN)
+
+	// Caching configuration
+	var cacheConfig caching.Config
+	cacheConfig.Logger = l
+
+	if err := cacheConfig.Configure(); err != nil {
+		l.Fatal().Err(err).Msg("failed to configure caching")
+	}
 
 	// Start the HTTP server
 	var httpServer htserver.Config

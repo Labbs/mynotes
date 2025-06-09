@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
-import type { Document } from '../../../api/document'
+import type { Document } from '../../../api/interface'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { ExcalidrawWrapper } from './ExcalidrawWrapper'

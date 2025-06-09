@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = "./tmp/main migration -c config.json && ./tmp/main server -c config.json"
+  bin = "./tmp/main migration -c config.yaml && ./tmp/main server -c config.yaml"
   cmd = "go build -o ./tmp/main cmd/cmd.go"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "ui"]

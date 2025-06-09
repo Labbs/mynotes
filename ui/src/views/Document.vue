@@ -6,6 +6,7 @@ import { useFavoriteStore } from '../stores/favorite';
 import Header from '../components/document/Header.vue';
 import ExcalidrawEditor from '../components/document/excalidraw/ExcalidrawEditor.vue'
 import TiptapEditor from '../components/document/tiptap/TiptapEditor.vue'
+import ConfigSidebar from '../components/document/ConfigSidebar.vue'
 
 const route = useRoute()
 const documentStore = useDocumentStore();
@@ -81,7 +82,7 @@ const toggleEditorEditable = () => {
 };
 
 const favorite = async () => {
-  if (favoritesStore.favorites.some(f => f.document?.id === currentDocument.value?.id)) {
+  if (favoritesStore.favorites.some((f: any) => f.document?.id === currentDocument.value?.id)) {
     await favoritesStore.unFavorite(currentDocument.value?.id as string);
   } else {
     await favoritesStore.addFavorite(currentDocument.value?.id as string);
@@ -166,7 +167,7 @@ const saveDocument = async (content: string) => {
 </script>
 
 <template>
-  <main class="flex-1 flex flex-col overflow-hidden">
+  <main class="flex-1 flex flex-col overflow-hidden bg-white">
     <!-- Afficher un indicateur de chargement -->
     <div v-if="documentStore.loadingDocument" class="flex justify-center items-center h-screen">
       <div class="animate-pulse text-xl text-gray-500">Loading the document</div>
@@ -174,11 +175,9 @@ const saveDocument = async (content: string) => {
     
     <!-- Afficher le contenu une fois chargé -->
     <template v-else-if="currentDocument">
-      <div class="flex flex-col h-full">
-        <div 
-          :class="{ 'mr-72': configSidebarVisible }" 
-          class="transition-all duration-300 ease-in-out w-full flex flex-col flex-1"
-        >
+      <div class="flex h-full">
+        <!-- Contenu principal du document -->
+        <div class="flex flex-col flex-1 min-w-0">
           <Header 
             :current-document="currentDocument" 
             :is-editing-title="isEditingTitle" 
@@ -221,6 +220,23 @@ const saveDocument = async (content: string) => {
             />
           </div>
         </div>
+
+        <!-- Config Sidebar -->
+        <Transition name="config-sidebar">
+          <div 
+            v-if="configSidebarVisible" 
+            class="w-72 border-l border-gray-200 bg-white flex-shrink-0"
+          >
+            <ConfigSidebar 
+              :visible="true"
+              :currentDocument="currentDocument"
+              @close="configSidebarVisible = false"
+              @setDocumentIcon="updateDocumentIcon"
+              @setLock="lockDocument"
+              @setFullWidth="fullWidth"
+            />
+          </div>
+        </Transition>
       </div>
     </template>
     
@@ -327,5 +343,23 @@ const saveDocument = async (content: string) => {
 .ProseMirror th {
   font-weight: bold;
   background-color: #f1f3f5;
+}
+
+/* Transition pour la config sidebar */
+.config-sidebar-enter-active,
+.config-sidebar-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.config-sidebar-enter-from,
+.config-sidebar-leave-to {
+  width: 0px;
+  opacity: 0;
+}
+
+.config-sidebar-enter-to,
+.config-sidebar-leave-from {
+  width: 18rem; /* w-72 */
+  opacity: 1;
 }
 </style>

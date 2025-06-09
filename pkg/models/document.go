@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gosimple/slug"
 	"github.com/labbs/mynotes/internal/shortuuid"
+	"github.com/labbs/mynotes/pkg/caching"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +25,10 @@ type Document struct {
 	Metadata   JSONB          `json:"metadata"`
 	ParentId   string         `json:"parent_id"`
 	Properties Properties     `json:"properties"`
+
+	Members Members `json:"members"`
+
+	Public bool `json:"public"`
 
 	SpaceId string `json:"space_id"`
 
@@ -43,6 +48,30 @@ func (d Document) TableName() string {
 func (d *Document) BeforeCreate(tx *gorm.DB) error {
 	d.Id = utils.UUIDv4()
 	d.Slug = slug.Make(d.Name + "-" + shortuuid.GenerateShortUUID())
+	return nil
+}
+
+// AfterCreate is a hook that runs after creating a document
+func (d *Document) AfterCreate(tx *gorm.DB) error {
+	// Cache the document members after creation with id and slug
+	caching.Cache.Set("document:"+d.Id, d.Members)
+	caching.Cache.Set("document:slug:"+d.Slug, d.Members)
+	return nil
+}
+
+// AfterUpdate is a hook that runs after updating a document
+func (d *Document) AfterUpdate(tx *gorm.DB) error {
+	// Update the cached document members after update with id and slug
+	caching.Cache.Set("document:"+d.Id, d.Members)
+	caching.Cache.Set("document:slug:"+d.Slug, d.Members)
+	return nil
+}
+
+// AfterDelete is a hook that runs after deleting a document
+func (d *Document) AfterDelete(tx *gorm.DB) error {
+	// Remove the cached document members after deletion with id and slug
+	caching.Cache.Delete("document:" + d.Id)
+	caching.Cache.Delete("document:slug:" + d.Slug)
 	return nil
 }
 
@@ -138,6 +167,10 @@ type DocumentRepository interface {
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
 	DeleteDocument(id string) error
+	GetAllDocuments() ([]Document, error)
+	GetAllDeletedDocument() ([]Document, error)
+	RestoreDocument(id string) error
+	GetDocumentsBySpaceId(spaceId string) ([]Document, error)
 }
 
 // DocumentService is the service for documents
@@ -150,4 +183,8 @@ type DocumentService interface {
 	UpdateDocument(document Document) (Document, error)
 	DeleteDocument(id string) error
 	GetExcalidrawLibsList() ([]string, error)
+	GetAllDocuments() ([]Document, error)
+	GetAllDeletedDocument() ([]Document, error)
+	RestoreDocument(id string) error
+	GetDocumentsBySpaceId(spaceId string) ([]Document, error)
 }

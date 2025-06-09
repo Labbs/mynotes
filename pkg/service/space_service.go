@@ -40,3 +40,12 @@ func (s *spaceService) CreateSpace(space models.Space) (models.Space, error) {
 func (s *spaceService) IsMember(spaceId, userId string) (bool, error) {
 	return s.spaceRepository.IsMember(spaceId, userId)
 }
+
+func (s *spaceService) GetAllSpaces() ([]models.Space, error) {
+	spaces, err := s.spaceRepository.GetAllSpaces()
+	if err != nil {
+		return []models.Space{}, err
+	}
+
+	return spaces, nil
+}

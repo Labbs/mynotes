@@ -13,6 +13,7 @@ func GenericFlags() []cli.Flag {
 			Aliases: []string{"c"},
 			EnvVars: []string{"CONFIG"},
 			Usage:   "Load configuration from `FILE`",
+			Value:   "config.yaml",
 		},
 		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:        "dev-mode",

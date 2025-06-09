@@ -75,3 +75,10 @@ func (sr *spaceRepository) IsMember(spaceId, userId string) (bool, error) {
 		return count > 0, err
 	}
 }
+
+// GetAllSpaces returns all spaces
+func (sr *spaceRepository) GetAllSpaces() ([]models.Space, error) {
+	var spaces []models.Space
+	err := sr.db.Table("space").Find(&spaces).Error
+	return spaces, err
+}

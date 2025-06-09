@@ -89,3 +89,19 @@ func (s *documentService) GetExcalidrawLibsList() ([]string, error) {
 	}
 	return files, nil
 }
+
+func (s *documentService) GetAllDocuments() ([]models.Document, error) {
+	return s.documentRepository.GetAllDocuments()
+}
+
+func (s *documentService) GetAllDeletedDocument() ([]models.Document, error) {
+	return s.documentRepository.GetAllDeletedDocument()
+}
+
+func (s *documentService) RestoreDocument(id string) error {
+	return s.documentRepository.RestoreDocument(id)
+}
+
+func (s *documentService) GetDocumentsBySpaceId(spaceId string) ([]models.Document, error) {
+	return s.documentRepository.GetDocumentsBySpaceId(spaceId)
+}

@@ -22,7 +22,7 @@ type DocumentController struct {
 // @Param spaceId path string true "Space Id"
 // @Success 200 {array} models.Document
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document/space/{spaceId} [get]
+// @Router /api/v1/document/space/{spaceId} [get]
 func (dc *DocumentController) GetDocumentsFromSpace(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
@@ -47,6 +47,7 @@ func (dc *DocumentController) GetDocumentsFromSpace(ctx *fiber.Ctx) error {
 // @Param documentId path string true "Document Id"
 // @Success 200 {array} models.Document
 // @Failure 500 {object} models.ErrorResponse
+// @Router /api/v1/document/{spaceId}/{documentId} [get]
 func (dc *DocumentController) GetDocumentsFromParentDocument(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 

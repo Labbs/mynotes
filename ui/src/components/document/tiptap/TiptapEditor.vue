@@ -25,7 +25,7 @@ import CommandMenuExtension from '../../../extensions/Commands'
 import suggestion from '../../../extensions/Suggestion'
 import Highlight from '@tiptap/extension-highlight'
 import BubbleMenu from '../../../components/tiptap/BubbleMenu.vue'
-import type { Document } from '../../../api/document'
+import type { Document } from '../../../api/interface'
 
 const props = defineProps<{
   document: Document

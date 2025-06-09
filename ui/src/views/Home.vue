@@ -33,7 +33,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="flex-1 p-10 overflow-y-auto flex flex-col items-center">
+  <main class="flex-1 p-10 overflow-y-auto flex flex-col items-center bg-white">
     <div v-if="isLoading" class="animate-pulse">
       <div class="h-8 w-64 bg-gray-200 rounded"></div>
     </div>

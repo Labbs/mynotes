@@ -1,25 +1,5 @@
 import api from './axios'
-
-export interface Document {
-  id: string
-  name: string
-  space_id: string
-  type: 'document' | 'excalidraw' | 'database'
-  parent_id?: string
-  slug?: string
-  // properties: Property[]
-  config: Config
-  content?: string
-  created_at?: string
-  updated_at?: string
-}
-
-export interface Config {
-  full_width?: boolean
-  icon?: string
-  lock?: boolean
-  header_background?: string
-}
+import type { Document } from './interface'
 
 export interface CreateDocumentParams {
   name: string

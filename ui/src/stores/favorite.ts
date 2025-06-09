@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
-import { meApi, type MyFavorite } from '../api/me';
+import { meApi } from '../api/me';
+import type { Favorite } from '../api/interface';
 
 interface FavoriteState {
-  favorites: MyFavorite[];
+  favorites: Favorite[];
   loading: boolean;
   error: string | null;
 }

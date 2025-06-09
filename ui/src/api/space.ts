@@ -1,15 +1,5 @@
 import api from './axios'
-
-export interface Space {
-  id: string
-  name: string
-  description?: string
-  slug?: string
-  icon?: string
-  organisation_owner_id?: string
-  user_owner_id?: string
-  created_at?: string
-}
+import type { Space } from './interface'
 
 interface SpacesResponse {
   spaces: Space[]

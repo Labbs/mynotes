@@ -23,6 +23,7 @@ func upGroup(ctx context.Context, tx *sql.Tx) error {
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			description TEXT,
+			role TEXT,
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL
 		);
@@ -34,6 +35,7 @@ func upGroup(ctx context.Context, tx *sql.Tx) error {
 			id uuid PRIMARY KEY,
 			name varchar NOT NULL,
 			description varchar,
+			role varchar,
 			created_at timestamp NOT NULL,
 			updated_at timestamp NOT NULL
 		);
