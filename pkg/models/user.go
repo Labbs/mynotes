@@ -56,6 +56,7 @@ type UserRepository interface {
 	GetAllUsers() ([]User, error)
 	GetAllInactiveUsers() ([]User, error)
 	GetUserWithGroups(id string) (User, error)
+	GetUsersWithGroups() ([]User, error)
 }
 
 // UserService defines the methods that a user service should implement.
@@ -72,4 +73,5 @@ type UserService interface {
 	GetAllInactiveUsers() ([]User, error)
 	UpdatePreferences(id string, preferences JSONB) error
 	GetUserWithGroups(id string) (User, error)
+	GetUsersWithGroups() ([]User, error)
 }
