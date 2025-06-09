@@ -128,7 +128,7 @@ func (r *userRepository) UpdatePreferences(id string, preferences models.JSONB) 
 	return r.db.Debug().Model(&models.User{}).Where("id = ?", id).Update("preferences", preferences).Error
 }
 
-// GetByIdWithGroups retrieves a user by their ID, including their groups.
+// GetUserWithGroups retrieves a user by their ID, including their groups.
 func (r *userRepository) GetUserWithGroups(id string) (models.User, error) {
 	var user models.User
 	err := r.db.Debug().Preload("Groups").Where("id = ?", id).First(&user).Error
@@ -136,4 +136,14 @@ func (r *userRepository) GetUserWithGroups(id string) (models.User, error) {
 		return models.User{}, err
 	}
 	return user, nil
+}
+
+// GetUsersWithGroups retrieves all users with their associated groups.
+func (r *userRepository) GetUsersWithGroups() ([]models.User, error) {
+	var users []models.User
+	err := r.db.Debug().Preload("Groups").Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
