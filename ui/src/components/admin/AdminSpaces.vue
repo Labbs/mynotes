@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useAdminStore } from '../../stores/admin'
+import { computed, onMounted } from 'vue';
+import { useAdminStore } from '../../stores/admin';
+import { useDateFormatter } from '../../composables/useDateFormater';
+import { UserIcon, UserGroupIcon } from '@heroicons/vue/24/outline';
 
 const adminStore = useAdminStore()
+const { formatDate } = useDateFormatter()
 
 const spaces = computed(() => adminStore.spaces)
 const loading = computed(() => adminStore.loading.spaces)
@@ -11,27 +14,13 @@ const error = computed(() => adminStore.error)
 onMounted(() => {
   if (spaces.value.length === 0) {
     adminStore.fetchSpaces()
+    console.log(spaces)
   }
 })
 </script>
 
 <template>
   <div>
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-semibold text-gray-800">Spaces Management</h2>
-      <button
-        @click="adminStore.fetchSpaces()"
-        :disabled="loading"
-        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-      >
-        <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Refresh
-      </button>
-    </div>
-
     <!-- Error State -->
     <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
       <div class="flex">
@@ -53,8 +42,7 @@ onMounted(() => {
     </div>
 
     <!-- Spaces Table -->
-    <div v-else class="bg-white shadow overflow-hidden sm:rounded-md">
-      <div class="px-4 py-5 sm:p-6">
+    <div v-else class="bg-white overflow-hidden">
         <div class="flow-root">
           <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -68,16 +56,16 @@ onMounted(() => {
                       Description
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Owner
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Group
+                      Members
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Created
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Updated
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -103,23 +91,33 @@ onMounted(() => {
                         {{ space.description || 'No description' }}
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex-shrink-0 h-8 w-8">
-                          <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-                            <span class="text-xs font-medium text-white">
-                            </span>
-                          </div>
-                        </div>
-                        <div class="ml-3">
-                          <div class="text-sm font-medium text-gray-900">
-                          </div>
-                        </div>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div class="flex gap-1">
+                        <span 
+                          v-for="member in space.members_with_users_or_groups" 
+                          :key="member.id"
+                          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                        >
+                          <template v-if="member.type === 'user'">
+                            <UserIcon class="w-4 h-4 mr-1" /> 
+                            {{ member.user?.name || member.user?.email }}: {{ member.access }}
+                          </template>
+                          <template v-else-if="member.type === 'group'">
+                            <UserGroupIcon class="w-4 h-4 mr-1" /> 
+                            {{ member.group?.name }}: {{ member.access }}
+                          </template>
+                        </span>
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">
+                        {{ formatDate(space.created_at)}}
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div class="text-sm text-gray-500">
+                        {{ formatDate(space.updated_at) }}
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     </td>
@@ -138,7 +136,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
