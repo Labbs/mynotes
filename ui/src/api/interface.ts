@@ -14,6 +14,8 @@ export interface Space {
   slug?: string
   icon?: string
   icon_color?: string
+  members?: Member[]
+  members_with_users_or_groups?: MemberWithUserOrGroup[]
   created_at?: string
   updated_at?: string
 }
@@ -68,4 +70,15 @@ export interface Group {
   created_at?: string
   updated_at?: string
   users?: User[]
+}
+
+export interface Member {
+  id: string
+  type: 'user' | 'group'
+  access: 'viewer' | 'editor' | 'comment' | 'full'
+}
+
+export interface MemberWithUserOrGroup extends Member {
+  user?: User
+  group?: Group
 }
