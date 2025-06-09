@@ -40,3 +40,8 @@ func (s *groupService) UpdateGroup(group models.Group) (models.Group, error) {
 func (s *groupService) DeleteGroup(id string) error {
 	return s.groupRepository.Delete(id)
 }
+
+// GetAllGroupsWithUsers returns all groups with users
+func (s *groupService) GetAllGroupsWithUsers() ([]models.Group, error) {
+	return s.groupRepository.GetAllGroupsWithUsers()
+}
