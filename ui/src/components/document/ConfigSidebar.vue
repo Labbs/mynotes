@@ -100,13 +100,8 @@ const deleteDocument = (documentId: string) => {
 </script>
 
 <template>
-  <!-- Sidebar avec transition -->
-  <Transition name="sidebar">
-    <div 
-      v-if="visible" 
-      class="fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-200 shadow-lg z-40 overflow-y-auto transform"
-      style="height: 100%;"
-    >
+  <!-- Sidebar Content -->
+  <div class="h-full overflow-y-auto">
     <div class="sticky top-0 p-4 border-b border-gray-200 flex justify-between items-center bg-white z-10">
       <h2 class="text-lg font-medium text-gray-800">Configuration</h2>
       <button 
@@ -166,8 +161,8 @@ const deleteDocument = (documentId: string) => {
             </svg>
           </button>
           <div 
-            v-if="activeAccordions.has('icon')" 
-            class="px-3 py-2 mt-1 bg-gray-50 rounded-md overflow-visible transition-all"
+            class="accordion-content px-3 py-2 mt-1 bg-gray-50 rounded-md overflow-hidden transition-all duration-300 ease-in-out"
+            :class="{ 'max-h-[32rem] opacity-100': activeAccordions.has('icon'), 'max-h-0 opacity-0 py-0 mt-0': !activeAccordions.has('icon') }"
           >
             <!-- Current Icon -->
             <div v-if="currentIcon" class="mb-4 p-2 bg-white rounded-md border border-gray-200">
@@ -209,7 +204,7 @@ const deleteDocument = (documentId: string) => {
             </div>
             
             <!-- Icons Content -->
-            <div class="bg-white p-2 rounded-md border border-gray-200 max-h-80 overflow-y-auto">
+            <div class="bg-white p-2 rounded-md border border-gray-200 max-h-56 overflow-y-auto scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300">
               <!-- Émojis -->
               <div v-if="activeTab === 'emoji'" class="grid grid-cols-5 gap-2">
                 <button 
@@ -240,7 +235,7 @@ const deleteDocument = (documentId: string) => {
         </div>
       </div>
     </div>
-    <div class="sticky top-0 p-4 border-b border-gray-200 flex justify-between items-center bg-white z-10">
+    <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
       <button class="w-full px-4 py-1 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md shadow-sm transition-colors flex items-center justify-center"
         @click="deleteDocument(props.currentDocument?.id || '')">
         <label class="inline-flex items-center me-5 cursor-pointer">
@@ -252,7 +247,6 @@ const deleteDocument = (documentId: string) => {
       </button>
     </div>
   </div>
-  </Transition>
 </template>
 
 <style scoped>
@@ -273,28 +267,37 @@ const deleteDocument = (documentId: string) => {
   transform: scale(0.95);
 }
 
-/* Transition pour la sidebar */
-.sidebar-enter-active,
-.sidebar-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-
-.sidebar-enter-from,
-.sidebar-leave-to {
-  transform: translateX(100%);
-}
-
-/* Styles pour l'accordéon */
+/* Styles pour l'accordéon améliorés */
 .accordion-item {
   transition: all 0.3s ease;
 }
 
-.accordion-item > div {
-  max-height: 0;
-  transition: max-height 0.5s ease, padding 0.3s ease, margin 0.3s ease;
+.accordion-content {
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out;
 }
 
-.accordion-item > div[v-if="true"] {
-  max-height: 1000px; /* Augmenter la valeur pour accommoder tous les emojis/icônes */
+/* Styles personnalisés pour la scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-track-gray-100::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 3px;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Pour Firefox */
+.max-h-56 {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f5f5f5;
 }
 </style>
