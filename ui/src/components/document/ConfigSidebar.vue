@@ -2,8 +2,10 @@
 import { computed, ref, watch } from 'vue';
 import { type Document } from '../../api/interface';
 import { useDocumentStore } from '../../stores/document';
+import { useDateFormatter } from '../../composables/useDateFormater';
 
 const documentStore = useDocumentStore();
+const { formatDate } = useDateFormatter();
 
 const props = defineProps<{
   visible: boolean;
@@ -114,7 +116,7 @@ const deleteDocument = (documentId: string) => {
       </button>
     </div>
     <div class="sticky top-0 p-4 border-b border-gray-200 flex justify-between items-center bg-white z-10">
-      <span class="text-xs text-gray-400">Last updated: {{ props.currentDocument?.updated_at ? new Date(props.currentDocument.updated_at).toLocaleString() : 'N/A' }}</span>
+      <span class="text-xs text-gray-400">Last updated: {{ formatDate(props.currentDocument?.updated_at) }}</span>
     </div>
     <div class="sticky top-0 p-4 border-b border-gray-200 flex justify-between items-center bg-white z-10">
       <label class="inline-flex items-center me-5 cursor-pointer">
