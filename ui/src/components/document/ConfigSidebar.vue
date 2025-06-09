@@ -161,8 +161,11 @@ const deleteDocument = (documentId: string) => {
             </svg>
           </button>
           <div 
-            class="accordion-content px-3 py-2 mt-1 bg-gray-50 rounded-md overflow-hidden transition-all duration-300 ease-in-out"
-            :class="{ 'max-h-[32rem] opacity-100': activeAccordions.has('icon'), 'max-h-0 opacity-0 py-0 mt-0': !activeAccordions.has('icon') }"
+            class="accordion-content overflow-hidden transition-all duration-300 ease-in-out"
+            :class="{ 
+              'max-h-[32rem] opacity-100 px-3 py-2 mt-1 bg-gray-50 rounded-md': activeAccordions.has('icon'), 
+              'max-h-0 opacity-0': !activeAccordions.has('icon') 
+            }"
           >
             <!-- Current Icon -->
             <div v-if="currentIcon" class="mb-4 p-2 bg-white rounded-md border border-gray-200">
