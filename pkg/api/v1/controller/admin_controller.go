@@ -26,7 +26,7 @@ type AdminController struct {
 func (ac *AdminController) GetUsers(ctx *fiber.Ctx) error {
 	logger := ac.Logger.With().Str("event", "api.admin.get_users").Logger()
 
-	users, err := ac.UserService.GetAllUsers()
+	users, err := ac.UserService.GetUsersWithGroups()
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting users")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
@@ -47,7 +47,7 @@ func (ac *AdminController) GetUsers(ctx *fiber.Ctx) error {
 func (ac *AdminController) GetGroups(ctx *fiber.Ctx) error {
 	logger := ac.Logger.With().Str("event", "api.admin.get_groups").Logger()
 
-	groups, err := ac.GroupService.GetAllGroups()
+	groups, err := ac.GroupService.GetAllGroupsWithUsers()
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting groups")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
@@ -74,8 +74,39 @@ func (ac *AdminController) GetSpaces(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
 	}
 
-	logger.Debug().Int("count", len(spaces)).Msg("Spaces retrieved successfully")
+	for i, space := range spaces {
+		membersWithUsersOrGroups := models.MembersWithUsersOrGroups{}
+		for _, member := range space.Members {
+			switch member.Type {
+			case models.MemberTypeUser:
+				user, err := ac.UserService.GetById(member.Id)
+				if err != nil {
+					logger.Error().Err(err).Str("member_id", member.Id).Msg("Error getting user for space member")
+					return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+				}
+				membersWithUsersOrGroups = append(membersWithUsersOrGroups, models.MemberWithUsersOrGroups{
+					Member: member,
+					User:   user,
+				})
+			case models.MemberTypeGroup:
+				group, err := ac.GroupService.GetGroupById(member.Id)
+				if err != nil {
+					logger.Error().Err(err).Str("member_id", member.Id).Msg("Error getting group for space member")
+					return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+				}
+				membersWithUsersOrGroups = append(membersWithUsersOrGroups, models.MemberWithUsersOrGroups{
+					Member: member,
+					Group:  group,
+				})
+			default:
+				logger.Warn().Str("member_type", string(member.Type)).Msg("Unknown member type in space")
+			}
+		}
+		space.MembersWithUsersOrGroups = membersWithUsersOrGroups
+		// Update the space in the slice
+		spaces[i] = space
+	}
+
+	logger.Debug().Int("count", len(spaces)).Interface("spaces", spaces).Msg("Spaces retrieved successfully")
 	return ctx.Status(fiber.StatusOK).JSON(spaces)
 }
-
-// GetDocuments godoc
