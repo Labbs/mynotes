@@ -27,6 +27,7 @@ type MemberType string
 type AccessType string
 
 type Members []Member
+type MembersWithUsersOrGroups []MemberWithUsersOrGroups
 
 func (m Members) Value() (driver.Value, error) {
 	valueString, err := json.Marshal(m)
@@ -42,6 +43,13 @@ type Member struct {
 	Id     string     `json:"id"`
 	Type   MemberType `json:"type"`
 	Access AccessType `json:"access"`
+}
+
+// MemberWithUser is a model for a member with user information
+type MemberWithUsersOrGroups struct {
+	Member
+	User  User  `json:"user,omitempty"`
+	Group Group `json:"group,omitempty"`
 }
 
 // AccessTypeViewer is the access type viewer
