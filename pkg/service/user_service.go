@@ -57,9 +57,9 @@ func (s *userService) UpdatePreferences(id string, preferences models.JSONB) err
 }
 
 func (s *userService) GetUserWithGroups(id string) (models.User, error) {
-	user, err := s.userRepository.GetUserWithGroups(id)
-	if err != nil {
-		return models.User{}, err
-	}
-	return user, nil
+	return s.userRepository.GetUserWithGroups(id)
+}
+
+func (s *userService) GetUsersWithGroups() ([]models.User, error) {
+	return s.userRepository.GetUsersWithGroups()
 }
