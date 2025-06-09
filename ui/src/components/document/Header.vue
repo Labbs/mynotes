@@ -109,16 +109,6 @@ const vFocus: Directive = {
         </button>
       </div>
     </div>
-    
-    <!-- Config Sidebar -->
-    <ConfigSidebar 
-      :visible="showConfigSidebar" 
-      :currentDocument="currentDocument"
-      @close="toggleConfigSidebar"
-      @setDocumentIcon="applyIcon"
-      @setLock="toggleLock"
-      @setFullWidth="fullWidth"
-    />
   </div>
 </template>
 
