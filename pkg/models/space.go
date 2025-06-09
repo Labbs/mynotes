@@ -24,6 +24,9 @@ type Space struct {
 
 	Members Members `json:"members"`
 
+	// MembersWithUsers is used to return the members with user information
+	MembersWithUsersOrGroups MembersWithUsersOrGroups `json:"members_with_users_or_groups" gorm:"-"`
+
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
