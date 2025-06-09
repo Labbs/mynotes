@@ -54,3 +54,12 @@ func (r *groupRepository) Update(group models.Group) (models.Group, error) {
 func (r *groupRepository) Delete(id string) error {
 	return r.db.Where("id = ?", id).Delete(&models.Group{}).Error
 }
+
+// GetAllGroupsWithUsers returns all groups with users
+func (r *groupRepository) GetAllGroupsWithUsers() ([]models.Group, error) {
+	var groups []models.Group
+	if err := r.db.Preload("Users").Find(&groups).Error; err != nil {
+		return []models.Group{}, err
+	}
+	return groups, nil
+}
