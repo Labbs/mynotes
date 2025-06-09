@@ -67,7 +67,7 @@ const switchTab = (tabId: string) => {
         <div v-else class="bg-white">
           <!-- Tab Navigation -->
           <div class="border-b border-gray-200">
-            <nav class="-mb-px flex space-x-8 px-6 justify-center">
+            <nav class="-mb-px flex space-x-8 justify-center">
               <button
                 v-for="tab in tabs"
                 :key="tab.id"
@@ -85,17 +85,12 @@ const switchTab = (tabId: string) => {
             </nav>
           </div>
         </div>
-        <div class="max-w-6xl mx-auto">
+        <div class="mx-auto">
           
-          <!-- Tab Content -->
-          <div class="p-6">
             <!-- Profile Tab -->
             <div v-if="activeTab === 'profile'">
-              <div class="max-w-lg">
-                <h2 class="text-xl font-semibold text-gray-800 mb-6">Profile Information</h2>
-                
-                <div v-if="profileStore.profile" class="space-y-4">
-                  <div class="bg-gray-50 p-4 rounded-lg">
+              <div class="max-w-lg mx-auto">                
+                <div v-if="profileStore.profile" class="space-y-4 text-center">
                     <div class="grid grid-cols-1 gap-4">
                       <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -126,7 +121,6 @@ const switchTab = (tabId: string) => {
                         </p>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -145,7 +139,6 @@ const switchTab = (tabId: string) => {
             <div v-else-if="activeTab === 'spaces' && isAdmin">
               <AdminSpaces />
             </div>
-          </div>
         </div>
       </div>
     </div>
