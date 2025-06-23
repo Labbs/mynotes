@@ -1,1 +1,0 @@
-import{_ as s,c as o,b as t,p as a}from"./index-B2DG1Rbf.js";const n={},r={class:"flex-1 p-10 overflow-y-auto"};function c(l,e){return a(),o("main",r,e[0]||(e[0]=[t("main",{class:"flex-1 p-10 overflow-y-auto"},[t("h1",{class:"text-2xl font-medium text-gray-600"},"Settings")],-1)]))}const i=s(n,[["render",c]]);export{i as default};
