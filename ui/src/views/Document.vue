@@ -6,7 +6,7 @@ import { useFavoriteStore } from '../stores/favorite';
 import Header from '../components/document/Header.vue';
 import ExcalidrawEditor from '../components/document/excalidraw/ExcalidrawEditor.vue'
 import TiptapEditor from '../components/document/tiptap/TiptapEditor.vue'
-import ConfigSidebar from '../components/document/ConfigSidebar.vue'
+import ConfigSidebar from '../components/document/SettingsSidebar.vue'
 
 const route = useRoute()
 const documentStore = useDocumentStore();
