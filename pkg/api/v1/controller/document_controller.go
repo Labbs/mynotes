@@ -3,8 +3,8 @@ package controller
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gosimple/slug"
-	"github.com/labbs/mynotes/internal/shortuuid"
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/internal/shortuuid"
+	"github.com/labbs/zotion/pkg/models"
 	"github.com/rs/zerolog"
 )
 

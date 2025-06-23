@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/pkg/models"
 	"gorm.io/gorm"
 )
 

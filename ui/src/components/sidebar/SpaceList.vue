@@ -27,12 +27,12 @@ const currentSlug = computed(() => route.params.slug as string)
 // Chargement des espaces développés depuis le localStorage
 const loadExpandedItems = () => {
   try {
-    const savedExpandedSpaces = localStorage.getItem('mynotes_expanded_spaces')
+    const savedExpandedSpaces = localStorage.getItem('zotion_expanded_spaces')
     if (savedExpandedSpaces) {
       expandedSpaceIds.value = JSON.parse(savedExpandedSpaces)
     }
     
-    const savedExpandedDocuments = localStorage.getItem('mynotes_expanded_documents')
+    const savedExpandedDocuments = localStorage.getItem('zotion_expanded_documents')
     if (savedExpandedDocuments) {
       expandedDocumentIds.value = JSON.parse(savedExpandedDocuments)
     }
@@ -45,7 +45,7 @@ const loadExpandedItems = () => {
 const saveExpandedSpaces = () => {
   try {
     localStorage.setItem(
-      'mynotes_expanded_spaces',
+      'zotion_expanded_spaces',
       JSON.stringify(expandedSpaceIds.value)
     )
   } catch (err) {
@@ -57,7 +57,7 @@ const saveExpandedSpaces = () => {
 const saveExpandedDocuments = () => {
   try {
     localStorage.setItem(
-      'mynotes_expanded_documents',
+      'zotion_expanded_documents',
       JSON.stringify(expandedDocumentIds.value)
     )
   } catch (err) {

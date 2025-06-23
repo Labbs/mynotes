@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/pkg/models"
 	"gorm.io/gorm"
 )
 

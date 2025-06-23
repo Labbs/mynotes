@@ -9,8 +9,8 @@
     "http_logs": true
   },
   "session": {
-    "secret": "mynotes_session",
-    "cookie-name": "mynotes_session",
+    "secret": "zotion_session",
+    "cookie-name": "zotion_session",
     "cookie-max-age": 86400
   }
 }

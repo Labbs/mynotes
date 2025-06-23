@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/labbs/mynotes/pkg/config"
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/pkg/config"
+	"github.com/labbs/zotion/pkg/models"
 )
 
 type documentService struct {
