@@ -4,11 +4,11 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/api/middleware"
-	"github.com/labbs/mynotes/pkg/api/v1/controller"
-	_config "github.com/labbs/mynotes/pkg/config"
-	"github.com/labbs/mynotes/pkg/repository"
-	"github.com/labbs/mynotes/pkg/service"
+	"github.com/labbs/zotion/pkg/api/middleware"
+	"github.com/labbs/zotion/pkg/api/v1/controller"
+	_config "github.com/labbs/zotion/pkg/config"
+	"github.com/labbs/zotion/pkg/repository"
+	"github.com/labbs/zotion/pkg/service"
 )
 
 func NewDocumentRouter(config *Config) {

@@ -3,13 +3,13 @@ package migration
 import (
 	"errors"
 
-	"github.com/labbs/mynotes/internal/database"
-	"github.com/labbs/mynotes/internal/migration"
-	"github.com/labbs/mynotes/pkg/config"
-	logger "github.com/labbs/mynotes/pkg/logger"
+	"github.com/labbs/zotion/internal/database"
+	"github.com/labbs/zotion/internal/migration"
+	"github.com/labbs/zotion/pkg/config"
+	logger "github.com/labbs/zotion/pkg/logger"
 	"gorm.io/gorm"
 
-	"github.com/labbs/mynotes/pkg/flags"
+	"github.com/labbs/zotion/pkg/flags"
 
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"

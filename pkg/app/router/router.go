@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 
-	"github.com/labbs/mynotes/pkg/app/static"
+	"github.com/labbs/zotion/pkg/app/static"
 )
 
 type Config struct {

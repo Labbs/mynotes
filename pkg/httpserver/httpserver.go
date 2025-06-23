@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/goccy/go-json"
-	"github.com/labbs/mynotes/internal/logger/zerolog"
-	apiRouter "github.com/labbs/mynotes/pkg/api/router"
-	appRouter "github.com/labbs/mynotes/pkg/app/router"
+	"github.com/labbs/zotion/internal/logger/zerolog"
+	apiRouter "github.com/labbs/zotion/pkg/api/router"
+	appRouter "github.com/labbs/zotion/pkg/app/router"
 	z "github.com/rs/zerolog"
 	"gorm.io/gorm"
 

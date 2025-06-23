@@ -1,6 +1,6 @@
 package service
 
-import "github.com/labbs/mynotes/pkg/models"
+import "github.com/labbs/zotion/pkg/models"
 
 type sessionService struct {
 	sessionRepository models.SessionRepository
