@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/labbs/mynotes/pkg/cmd/migration"
-	"github.com/labbs/mynotes/pkg/cmd/server"
+	"github.com/labbs/zotion/pkg/cmd/migration"
+	"github.com/labbs/zotion/pkg/cmd/server"
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,7 +13,7 @@ var version = "development"
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "MyNotes"
+	app.Name = "Zotion"
 	app.Usage = ""
 	app.Version = version
 
