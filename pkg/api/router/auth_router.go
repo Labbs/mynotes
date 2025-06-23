@@ -44,4 +44,5 @@ func NewAuthRouter(config *Config) {
 	// and require the user to be authenticated
 	authPrivate := config.Fiber.Group("/api/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), middleware.RBACCheckMiddleware(config.Logger))
 	authPrivate.Post("/logout", c.Logout)
+	authPrivate.Get("/validate", c.ValidateSession)
 }
