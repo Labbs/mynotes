@@ -214,26 +214,3 @@ func (dc *DocumentController) DeleteDocument(ctx *fiber.Ctx) error {
 	logger.Debug().Str("document", documentId).Msg("Document deleted successfully")
 	return ctx.SendStatus(fiber.StatusNoContent)
 }
-
-// ListLibsExcalidraw godoc
-// @Summary List Excalidraw libraries
-// @Description List Excalidraw libraries
-// @Tags document
-// @Accept json
-// @Produce json
-// @Success 200 {array} []string
-// @Failure 500 {object} models.ErrorResponse
-// @Router /api/v1/document/excalidraw/libs [get]
-func (dc *DocumentController) ListLibsExcalidraw(ctx *fiber.Ctx) error {
-	logger := dc.Logger.With().Str("event", "api.documents.excalidraw.libs").Logger()
-
-	// list libraries from the configured path
-	libs, err := dc.DocumentService.GetExcalidrawLibsList()
-	if err != nil {
-		logger.Error().Err(err).Msg("Error listing Excalidraw libraries")
-		return ctx.Status(fiber.StatusInternalServerError).JSON([]string{})
-	}
-
-	logger.Debug().Msg("Excalidraw libraries listed successfully")
-	return ctx.Status(fiber.StatusOK).JSON(libs)
-}
