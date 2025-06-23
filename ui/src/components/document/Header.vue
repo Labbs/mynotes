@@ -3,7 +3,6 @@ import { type Directive, ref } from 'vue';
 import { useFavoriteStore } from '../../stores/favorite';
 import { type Document } from '../../api/interface';
 import { AdjustmentsHorizontalIcon } from "@heroicons/vue/24/solid";
-import ConfigSidebar from './ConfigSidebar.vue';
 
 const favoritesStore = useFavoriteStore();
 
@@ -34,20 +33,6 @@ const toggleConfigSidebar = () => {
   emit('toggleEditorEditable', !showConfigSidebar.value);
   // Notifier le parent de la visibilité de la sidebar
   emit('iconConfigVisibility', showConfigSidebar.value);
-};
-
-// Fonction pour appliquer une icône
-const applyIcon = (icon: string) => {
-  emit('setDocumentIcon', icon);
-};
-
-// Fonction pour basculer le verrouillage du document
-const toggleLock = (lock: boolean) => {
-  emit('toggleLock', lock);
-};
-
-const fullWidth = (fullWidth: boolean) => {
-  emit('setFullWidth', fullWidth);
 };
 
 // Directive focus
