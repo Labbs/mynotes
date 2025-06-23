@@ -101,12 +101,12 @@ func (ac *AuthController) Register(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	registerResponse, err := ac.AuthService.Register(registerRequest)
+	_, err := ac.AuthService.Register(registerRequest)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error registering user")
 		return ctx.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "User already exists"})
 	}
 
 	logger.Info().Str("user", registerRequest.Email).Msg("User registered successfully")
-	return ctx.Status(fiber.StatusCreated).JSON(registerResponse)
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User registered successfully"})
 }
