@@ -80,3 +80,7 @@ func IsAuthorized(token string) (bool, error) {
 
 	return true, nil
 }
+
+func IsSessionExpired(expire time.Time) bool {
+	return expire.Before(time.Now().Add(time.Second * time.Duration(config.Session.Expire)))
+}

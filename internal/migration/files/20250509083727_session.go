@@ -24,6 +24,7 @@ func upSession(ctx context.Context, tx *sql.Tx) error {
 			user_id TEXT NOT NULL,
 			user_agent TEXT NOT NULL,
 			ip_address TEXT NOT NULL,
+			expires_at datetime NOT NULL,
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -37,6 +38,7 @@ func upSession(ctx context.Context, tx *sql.Tx) error {
 			user_id uuid NOT NULL,
 			user_agent varchar NOT NULL,
 			ip_address varchar NOT NULL,
+			expires_at timestamp NOT NULL,
 			created_at timestamp NOT NULL,
 			updated_at timestamp NOT NULL,
 			FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -44,18 +46,7 @@ func upSession(ctx context.Context, tx *sql.Tx) error {
 		CREATE INDEX IF NOT EXISTS idx_session_user_id ON session (user_id);
 		`
 	case "mysql":
-		query = `
-		CREATE TABLE IF NOT EXISTS session (
-			id varchar(36) PRIMARY KEY,
-			user_id varchar(36) NOT NULL,
-			user_agent varchar(255) NOT NULL,
-			ip_address varchar(255) NOT NULL,
-			created_at datetime NOT NULL,
-			updated_at datetime NOT NULL,
-			FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
-		);
-		CREATE INDEX IF NOT EXISTS idx_session_user_id ON session (user_id);
-		`
+		return fmt.Errorf("mysql dialect is not supported yet")
 	default:
 		return fmt.Errorf("unsupported dialect: %s", config.Database.Dialect)
 	}
