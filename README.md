@@ -1,4 +1,4 @@
-# MyNotes
+# Zotion
 
 Small application for have a notion like
 
