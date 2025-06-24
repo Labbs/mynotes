@@ -5,12 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gosimple/slug"
-<<<<<<< HEAD
-	"github.com/labbs/mynotes/internal/shortuuid"
-	"github.com/labbs/mynotes/pkg/caching"
-=======
 	"github.com/labbs/zotion/internal/shortuuid"
->>>>>>> main
+	"github.com/labbs/zotion/pkg/caching"
 	"gorm.io/gorm"
 )
 

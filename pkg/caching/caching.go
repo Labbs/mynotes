@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/labbs/mynotes/pkg/config"
+	"github.com/labbs/zotion/pkg/config"
 	"github.com/rs/zerolog"
 )
 

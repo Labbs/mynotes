@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/internal/tokenutil"
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/internal/tokenutil"
+	"github.com/labbs/zotion/pkg/models"
 )
 
 func (c *Config) Check() fiber.Handler {

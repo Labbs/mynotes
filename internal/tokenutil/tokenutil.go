@@ -81,7 +81,6 @@ func IsAuthorized(token string) (bool, error) {
 	return true, nil
 }
 
-<<<<<<< HEAD
 // IsPasswordComplex checks if the password meets complexity requirements.
 func IsPasswordComplex(password string) bool {
 	hasUpper := false
@@ -103,8 +102,9 @@ func IsPasswordComplex(password string) bool {
 	}
 
 	return hasUpper && hasLower && hasNumber && hasSymbol
-=======
+}
+
+// IsSessionExpired checks if the session has expired based on the configured expiration time.
 func IsSessionExpired(expire time.Time) bool {
 	return expire.Before(time.Now().Add(time.Second * time.Duration(config.Session.Expire)))
->>>>>>> main
 }

@@ -29,8 +29,8 @@ caching:
 
 # Session settings
 session:
-  secret-key: "mynotes-secret-key" # Secret key for session encryption
-  issuer: "mynotes" # Issuer for JWT tokens
+  secret-key: "zotion-secret-key" # Secret key for session encryption
+  issuer: "zotion" # Issuer for JWT tokens
   expire: 604800 # 7 days in seconds
 
 # Registration settings

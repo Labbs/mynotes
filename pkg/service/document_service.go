@@ -60,30 +60,6 @@ func (s *documentService) DeleteDocument(id string) error {
 	}
 	return s.documentRepository.DeleteDocument(id)
 }
-<<<<<<< HEAD
-
-func (s *documentService) GetExcalidrawLibsList() ([]string, error) {
-	// Ensure the directory exists
-	if _, err := os.Stat(config.Document.ExcalidrawLibsPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(config.Document.ExcalidrawLibsPath, 0755); err != nil {
-			return nil, fmt.Errorf("failed to create excalidraw libraries directory: %w", err)
-		}
-	}
-
-	// List files in the Excalidraw libraries path
-	root := os.DirFS(config.Document.ExcalidrawLibsPath)
-
-	f, err := fs.Glob(root, "*.excalidrawlib")
-	if err != nil {
-		return []string{}, nil // Return empty list instead of error
-	}
-
-	var files []string
-	for _, v := range f {
-		files = append(files, strings.Split(v, ".")[0])
-	}
-	return files, nil
-}
 
 func (s *documentService) GetAllDocuments() ([]models.Document, error) {
 	return s.documentRepository.GetAllDocuments()
@@ -100,5 +76,3 @@ func (s *documentService) RestoreDocument(id string) error {
 func (s *documentService) GetDocumentsBySpaceId(spaceId string) ([]models.Document, error) {
 	return s.documentRepository.GetDocumentsBySpaceId(spaceId)
 }
-=======
->>>>>>> main

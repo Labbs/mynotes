@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/api/v1/controller"
-	"github.com/labbs/mynotes/pkg/repository"
-	"github.com/labbs/mynotes/pkg/service"
+	"github.com/labbs/zotion/pkg/api/v1/controller"
+	"github.com/labbs/zotion/pkg/repository"
+	"github.com/labbs/zotion/pkg/service"
 )
 
 func NewAdminRouter(config *Config, rbacMiddleware fiber.Handler) {

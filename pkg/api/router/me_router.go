@@ -1,18 +1,11 @@
 package router
 
 import (
-<<<<<<< HEAD
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/api/middleware"
-	"github.com/labbs/mynotes/pkg/api/v1/controller"
-	"github.com/labbs/mynotes/pkg/repository"
-	"github.com/labbs/mynotes/pkg/service"
-=======
 	"github.com/labbs/zotion/pkg/api/middleware"
 	"github.com/labbs/zotion/pkg/api/v1/controller"
 	"github.com/labbs/zotion/pkg/repository"
 	"github.com/labbs/zotion/pkg/service"
->>>>>>> main
 )
 
 func NewMeRouter(config *Config, rbacMiddleware fiber.Handler) {

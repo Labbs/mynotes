@@ -13,7 +13,7 @@ func init() {
 	goose.AddMigrationContext(upAdminUser, downAdminUser)
 }
 
-const emailAdminUser string = "admin@mynotes.local"
+const emailAdminUser string = "admin@zotion.local"
 const nameAdminUser string = "admin"
 
 func upAdminUser(ctx context.Context, tx *sql.Tx) error {

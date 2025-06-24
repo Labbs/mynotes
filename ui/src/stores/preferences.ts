@@ -87,8 +87,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
   // Charger depuis localStorage (fallback)
   function loadFromLocalStorage() {
     try {
-      const expandedSpaces = localStorage.getItem('mynotes_expanded_spaces')
-      const expandedDocuments = localStorage.getItem('mynotes_expanded_documents')
+      const expandedSpaces = localStorage.getItem('zotion_expanded_spaces')
+      const expandedDocuments = localStorage.getItem('zotion_expanded_documents')
       const sidebarCollapsed = localStorage.getItem('sidebarCollapsed')
       const sidebarWidth = localStorage.getItem('sidebarWidth')
 
@@ -112,8 +112,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
   // Synchroniser vers localStorage
   function syncToLocalStorage() {
     try {
-      localStorage.setItem('mynotes_expanded_spaces', JSON.stringify(preferences.value.ui.expanded_spaces))
-      localStorage.setItem('mynotes_expanded_documents', JSON.stringify(preferences.value.ui.expanded_documents))
+      localStorage.setItem('zotion_expanded_spaces', JSON.stringify(preferences.value.ui.expanded_spaces))
+      localStorage.setItem('zotion_expanded_documents', JSON.stringify(preferences.value.ui.expanded_documents))
       localStorage.setItem('sidebarCollapsed', preferences.value.ui.sidebarCollapsed.toString())
       localStorage.setItem('sidebarWidth', preferences.value.ui.sidebarWidth.toString())
     } catch (err) {
@@ -124,8 +124,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
   // Nettoyer localStorage (au logout)
   function clearLocalStorage() {
     try {
-      localStorage.removeItem('mynotes_expanded_spaces')
-      localStorage.removeItem('mynotes_expanded_documents')
+      localStorage.removeItem('zotion_expanded_spaces')
+      localStorage.removeItem('zotion_expanded_documents')
       localStorage.removeItem('sidebarCollapsed')
       localStorage.removeItem('sidebarWidth')
       

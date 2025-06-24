@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/api/middleware/rbac"
-	"github.com/labbs/mynotes/pkg/repository"
-	"github.com/labbs/mynotes/pkg/service"
+	"github.com/labbs/zotion/pkg/api/middleware/rbac"
+	"github.com/labbs/zotion/pkg/repository"
+	"github.com/labbs/zotion/pkg/service"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
 )

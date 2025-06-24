@@ -15,7 +15,7 @@ func SessionFlags() []cli.Flag {
 			Aliases:     []string{"ssk"},
 			EnvVars:     []string{"SESSION_SECRET_KEY"},
 			Usage:       "Session secret key",
-			Value:       "mynotes-secret-key",
+			Value:       "zotion-secret-key",
 			Destination: &config.Session.SecretKey,
 		}),
 		altsrc.NewIntFlag(&cli.IntFlag{
@@ -31,7 +31,7 @@ func SessionFlags() []cli.Flag {
 			Aliases:     []string{"si"},
 			EnvVars:     []string{"SESSION_ISSUER"},
 			Usage:       "Session issuer",
-			Value:       "mynotes",
+			Value:       "zotion",
 			Destination: &config.Session.Issuer,
 		}),
 	}
