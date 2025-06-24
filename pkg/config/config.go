@@ -25,6 +25,7 @@ var (
 		Expire    int
 		Issuer    string
 	}
+<<<<<<< HEAD
 
 	Document struct {
 		ExcalidrawLibsPath string
@@ -53,4 +54,6 @@ var (
 		PasswordMinLength        int             // Minimum password length for registration
 		PasswordComplexity       bool            // Require complex passwords (uppercase, lowercase, numbers, symbols)
 	}
+=======
+>>>>>>> main
 )

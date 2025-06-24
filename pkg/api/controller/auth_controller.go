@@ -1,8 +1,12 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/internal/tokenutil"
+	"github.com/labbs/zotion/pkg/config"
+	"github.com/labbs/zotion/pkg/models"
 	"github.com/rs/zerolog"
 )
 
@@ -42,6 +46,7 @@ func (ac *AuthController) Login(ctx *fiber.Ctx) error {
 	session.Id = loginResponse.SessionId
 	session.UserAgent = ctx.Get("User-Agent")
 	session.IpAddress = ctx.IP()
+	session.ExpiresAt = time.Now().Add(time.Second * time.Duration(config.Session.Expire))
 
 	// Create the session in the database
 	if err := ac.SessionService.Create(session); err != nil {
@@ -109,4 +114,52 @@ func (ac *AuthController) Register(ctx *fiber.Ctx) error {
 
 	logger.Info().Str("user", registerRequest.Email).Msg("User registered successfully")
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User registered successfully"})
+}
+
+// ValidateSession godoc
+// @Summary Validate session
+// @Description Validate the session of the user
+// @Tags auth
+// @Security ApiKeyAuth
+// @Success 200 {object} fiber.Map
+// @Failure 401 {object} fiber.Map
+// @Failure 404 {object} fiber.Map
+// @Router /api/auth/validate [get]
+func (ac *AuthController) ValidateSession(ctx *fiber.Ctx) error {
+	logger := ac.Logger.With().Str("event", "api.auth.validate").Logger()
+
+	// Get the session ID from the JWT token (set by middleware)
+	sessionId, ok := ctx.Locals("session_id").(string)
+	if !ok || sessionId == "" {
+		logger.Warn().Msg("No session ID found in context")
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid session"})
+	}
+
+	// Get the user ID from the JWT token
+	userId, ok := ctx.Locals("user_id").(string)
+	if !ok || userId == "" {
+		logger.Warn().Msg("No user ID found in context")
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid session"})
+	}
+
+	// Validate session exists and is active
+	session, err := ac.SessionService.GetById(sessionId)
+	if err != nil {
+		logger.Warn().Err(err).Str("session_id", sessionId).Msg("Session not found")
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Session not found"})
+	}
+
+	// Additional validation - check if session belongs to the user
+	if session.UserId != userId {
+		logger.Warn().Str("session_id", sessionId).Str("user_id", userId).Msg("Session does not belong to user")
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid session"})
+	}
+
+	if tokenutil.IsSessionExpired(session.ExpiresAt) {
+		logger.Warn().Str("session_id", sessionId).Msg("Session expired")
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Session expired"})
+	}
+
+	logger.Info().Str("session_id", sessionId).Str("user_id", userId).Msg("Session validated successfully")
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"valid": true})
 }

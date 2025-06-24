@@ -1,14 +1,10 @@
 package router
 
 import (
-	"strings"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/labbs/mynotes/pkg/api/middleware"
-	"github.com/labbs/mynotes/pkg/api/v1/controller"
-	_config "github.com/labbs/mynotes/pkg/config"
-	"github.com/labbs/mynotes/pkg/repository"
-	"github.com/labbs/mynotes/pkg/service"
+	"github.com/labbs/zotion/pkg/api/middleware"
+	"github.com/labbs/zotion/pkg/api/v1/controller"
+	"github.com/labbs/zotion/pkg/repository"
+	"github.com/labbs/zotion/pkg/service"
 )
 
 func NewDocumentRouter(config *Config, rbacMiddleware fiber.Handler) {
@@ -32,21 +28,4 @@ func NewDocumentRouter(config *Config, rbacMiddleware fiber.Handler) {
 	v1Document.Post("/", c.CreateDocument)
 	v1Document.Put("/:documentId", c.UpdateDocument)
 	v1Document.Delete("/:documentId", c.DeleteDocument)
-	v1Document.Get("/excalidraw/list/libs", c.ListLibsExcalidraw)
-
-	if _config.Document.ExcalidrawLibsPath != "" {
-		// Serve Excalidraw libraries from external directory
-		v1Document.Static("/excalidraw/libraries", _config.Document.ExcalidrawLibsPath, fiber.Static{
-			Next:     nil,
-			Browse:   true,
-			MaxAge:   3600,
-			Compress: true,
-			ModifyResponse: func(c *fiber.Ctx) error {
-				if strings.HasSuffix(c.Path(), ".excalidrawlib") {
-					c.Set(fiber.HeaderContentType, "application/json")
-				}
-				return nil
-			},
-		})
-	}
 }

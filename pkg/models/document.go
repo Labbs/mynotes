@@ -7,8 +7,12 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gosimple/slug"
+<<<<<<< HEAD
 	"github.com/labbs/mynotes/internal/shortuuid"
 	"github.com/labbs/mynotes/pkg/caching"
+=======
+	"github.com/labbs/zotion/internal/shortuuid"
+>>>>>>> main
 	"gorm.io/gorm"
 )
 
@@ -182,9 +186,12 @@ type DocumentService interface {
 	GetDocumentById(id string) (Document, error)
 	UpdateDocument(document Document) (Document, error)
 	DeleteDocument(id string) error
+<<<<<<< HEAD
 	GetExcalidrawLibsList() ([]string, error)
 	GetAllDocuments() ([]Document, error)
 	GetAllDeletedDocument() ([]Document, error)
 	RestoreDocument(id string) error
 	GetDocumentsBySpaceId(spaceId string) ([]Document, error)
+=======
+>>>>>>> main
 }

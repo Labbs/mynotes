@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/labbs/mynotes/pkg/config"
+	"github.com/labbs/zotion/pkg/config"
 	"github.com/pressly/goose/v3"
 )
 
@@ -24,6 +24,7 @@ func upSession(ctx context.Context, tx *sql.Tx) error {
 			user_id TEXT NOT NULL,
 			user_agent TEXT NOT NULL,
 			ip_address TEXT NOT NULL,
+			expires_at datetime NOT NULL,
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -37,6 +38,7 @@ func upSession(ctx context.Context, tx *sql.Tx) error {
 			user_id uuid NOT NULL,
 			user_agent varchar NOT NULL,
 			ip_address varchar NOT NULL,
+			expires_at timestamp NOT NULL,
 			created_at timestamp NOT NULL,
 			updated_at timestamp NOT NULL,
 			FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE

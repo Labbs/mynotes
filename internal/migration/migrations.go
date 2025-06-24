@@ -3,9 +3,9 @@ package migration
 import (
 	"embed"
 
-	"github.com/labbs/mynotes/internal/logger/zerolog"
+	"github.com/labbs/zotion/internal/logger/zerolog"
 
-	_ "github.com/labbs/mynotes/internal/migration/files"
+	_ "github.com/labbs/zotion/internal/migration/files"
 	"github.com/pressly/goose/v3"
 	z "github.com/rs/zerolog"
 	"gorm.io/gorm"

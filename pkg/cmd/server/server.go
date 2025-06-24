@@ -5,12 +5,20 @@ import (
 	"os/signal"
 	"syscall"
 
+<<<<<<< HEAD
 	"github.com/labbs/mynotes/internal/database"
 	"github.com/labbs/mynotes/pkg/caching"
 	"github.com/labbs/mynotes/pkg/config"
 	"github.com/labbs/mynotes/pkg/flags"
 	htserver "github.com/labbs/mynotes/pkg/httpserver"
 	logger "github.com/labbs/mynotes/pkg/logger"
+=======
+	"github.com/labbs/zotion/internal/database"
+	"github.com/labbs/zotion/pkg/config"
+	"github.com/labbs/zotion/pkg/flags"
+	htserver "github.com/labbs/zotion/pkg/httpserver"
+	logger "github.com/labbs/zotion/pkg/logger"
+>>>>>>> main
 
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"

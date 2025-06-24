@@ -6,9 +6,14 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2/utils"
+<<<<<<< HEAD
 	"github.com/labbs/mynotes/internal/tokenutil"
 	"github.com/labbs/mynotes/pkg/config"
 	"github.com/labbs/mynotes/pkg/models"
+=======
+	"github.com/labbs/zotion/internal/tokenutil"
+	"github.com/labbs/zotion/pkg/models"
+>>>>>>> main
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/labbs/mynotes/pkg/config"
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/pkg/config"
+	"github.com/labbs/zotion/pkg/models"
 )
 
 func CreateAccessToken(user_id, sessionId string) (accessToken string, err error) {
@@ -81,6 +81,7 @@ func IsAuthorized(token string) (bool, error) {
 	return true, nil
 }
 
+<<<<<<< HEAD
 // IsPasswordComplex checks if the password meets complexity requirements.
 func IsPasswordComplex(password string) bool {
 	hasUpper := false
@@ -102,4 +103,8 @@ func IsPasswordComplex(password string) bool {
 	}
 
 	return hasUpper && hasLower && hasNumber && hasSymbol
+=======
+func IsSessionExpired(expire time.Time) bool {
+	return expire.Before(time.Now().Add(time.Second * time.Duration(config.Session.Expire)))
+>>>>>>> main
 }

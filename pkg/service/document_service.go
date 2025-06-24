@@ -1,13 +1,7 @@
 package service
 
 import (
-	"fmt"
-	"io/fs"
-	"os"
-	"strings"
-
-	"github.com/labbs/mynotes/pkg/config"
-	"github.com/labbs/mynotes/pkg/models"
+	"github.com/labbs/zotion/pkg/models"
 )
 
 type documentService struct {
@@ -66,6 +60,7 @@ func (s *documentService) DeleteDocument(id string) error {
 	}
 	return s.documentRepository.DeleteDocument(id)
 }
+<<<<<<< HEAD
 
 func (s *documentService) GetExcalidrawLibsList() ([]string, error) {
 	// Ensure the directory exists
@@ -105,3 +100,5 @@ func (s *documentService) RestoreDocument(id string) error {
 func (s *documentService) GetDocumentsBySpaceId(spaceId string) ([]models.Document, error) {
 	return s.documentRepository.GetDocumentsBySpaceId(spaceId)
 }
+=======
+>>>>>>> main

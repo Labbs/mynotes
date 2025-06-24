@@ -1,4 +1,4 @@
-module github.com/labbs/mynotes
+module github.com/labbs/zotion
 
 go 1.23.1
 

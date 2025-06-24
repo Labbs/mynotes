@@ -1,11 +1,18 @@
 package router
 
 import (
+<<<<<<< HEAD
 	"github.com/gofiber/fiber/v2"
 	"github.com/labbs/mynotes/pkg/api/controller"
 	"github.com/labbs/mynotes/pkg/api/middleware"
 	"github.com/labbs/mynotes/pkg/repository"
 	"github.com/labbs/mynotes/pkg/service"
+=======
+	"github.com/labbs/zotion/pkg/api/controller"
+	"github.com/labbs/zotion/pkg/api/middleware"
+	"github.com/labbs/zotion/pkg/repository"
+	"github.com/labbs/zotion/pkg/service"
+>>>>>>> main
 )
 
 func NewAuthRouter(config *Config, rbacMiddleware fiber.Handler) {
@@ -45,4 +52,5 @@ func NewAuthRouter(config *Config, rbacMiddleware fiber.Handler) {
 	// and require the user to be authenticated
 	authPrivate := config.Fiber.Group("/api/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), rbacMiddleware)
 	authPrivate.Post("/logout", c.Logout)
+	authPrivate.Get("/validate", c.ValidateSession)
 }

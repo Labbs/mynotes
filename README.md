@@ -1,10 +1,10 @@
-# MyNotes
+# Zotion
 
 Small application for have a notion like
 
 ## Development
 
-### Requirements
+### Informations
 The API is developed with Golang
 The libraries are:
 - fiber v2 (web framework)
@@ -12,14 +12,8 @@ The libraries are:
 - zerolog (logger)
 - goose (migration)
 
-The UI is developed with Vue 3
-The libraries are:
-- Vue 3
-- TipTap (WYSIWYG)
-- Tailwind CSS
+The UI is available in another repository ([link](https://github.com/labbs/zotion-ui))
 
-### Informations
-The API is compatible with SQLite and Postgresql.
+The application is compatible with SQLite and Postgresql.
 
 ### How to run
-
