@@ -23,7 +23,7 @@ func NewDocumentRouter(config *Config, rbacMiddleware fiber.Handler) {
 
 	v1Document := config.Fiber.Group("/api/v1/document", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(repository.NewSessionRepository(config.Db))), rbacMiddleware)
 	v1Document.Get("/space/:spaceId", c.GetDocumentsFromSpace)
-	v1Document.Get("/space/:spaceId/parent/:documentId", c.GetDocumentsFromParentDocument)
+	v1Document.Get("/parent/:documentId", c.GetDocumentsFromParentDocument)
 	v1Document.Get("/slug/:slug", c.GetDocumentBySlug)
 	v1Document.Get("/:documentId", c.GetDocumentById)
 	v1Document.Post("/", c.CreateDocument)
