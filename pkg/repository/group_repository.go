@@ -27,8 +27,8 @@ func (r *groupRepository) GetById(id string) (models.Group, error) {
 	return group, nil
 }
 
-// GetWithUsers returns a group with users
-func (r *groupRepository) GetWithUsers(id string) (models.Group, error) {
+// GetGroupWithUsers returns a group with users
+func (r *groupRepository) GetGroupWithUsers(id string) (models.Group, error) {
 	var group models.Group
 	if err := r.db.Preload("Users").Where("id = ?", id).First(&group).Error; err != nil {
 		return models.Group{}, err
@@ -53,4 +53,13 @@ func (r *groupRepository) Update(group models.Group) (models.Group, error) {
 // Delete deletes a group
 func (r *groupRepository) Delete(id string) error {
 	return r.db.Where("id = ?", id).Delete(&models.Group{}).Error
+}
+
+// GetAllGroupsWithUsers returns all groups with users
+func (r *groupRepository) GetAllGroupsWithUsers() ([]models.Group, error) {
+	var groups []models.Group
+	if err := r.db.Preload("Users").Find(&groups).Error; err != nil {
+		return []models.Group{}, err
+	}
+	return groups, nil
 }

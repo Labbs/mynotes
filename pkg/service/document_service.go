@@ -60,3 +60,19 @@ func (s *documentService) DeleteDocument(id string) error {
 	}
 	return s.documentRepository.DeleteDocument(id)
 }
+
+func (s *documentService) GetAllDocuments() ([]models.Document, error) {
+	return s.documentRepository.GetAllDocuments()
+}
+
+func (s *documentService) GetAllDeletedDocument() ([]models.Document, error) {
+	return s.documentRepository.GetAllDeletedDocument()
+}
+
+func (s *documentService) RestoreDocument(id string) error {
+	return s.documentRepository.RestoreDocument(id)
+}
+
+func (s *documentService) GetDocumentsBySpaceId(spaceId string) ([]models.Document, error) {
+	return s.documentRepository.GetDocumentsBySpaceId(spaceId)
+}

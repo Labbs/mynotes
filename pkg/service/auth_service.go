@@ -1,8 +1,13 @@
 package service
 
 import (
+	"fmt"
+	"slices"
+	"strings"
+
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/labbs/zotion/internal/tokenutil"
+	"github.com/labbs/zotion/pkg/config"
 	"github.com/labbs/zotion/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -53,6 +58,25 @@ func (s *authService) Login(request models.LoginRequest) (models.LoginResponse, 
 }
 
 func (s *authService) Register(request models.RegisterRequest) (models.RegisterResponse, error) {
+	if !config.Registration.Enabled {
+		return models.RegisterResponse{}, fmt.Errorf("registration is disabled")
+	}
+
+	emailDomain := strings.Split(request.Email, "@")[1]
+	if !slices.Contains(config.Registration.DomainWhitelist.Value(), emailDomain) && len(config.Registration.DomainWhitelist.Value()) > 0 {
+		return models.RegisterResponse{}, fmt.Errorf("email domain %s is not allowed for registration", emailDomain)
+	}
+
+	if len(request.Password) < config.Registration.PasswordMinLength {
+		return models.RegisterResponse{}, fmt.Errorf("password must be at least %d characters long", config.Registration.PasswordMinLength)
+	}
+
+	if config.Registration.PasswordComplexity {
+		if !tokenutil.IsPasswordComplex(request.Password) {
+			return models.RegisterResponse{}, fmt.Errorf("password must contain uppercase, lowercase, numbers, and symbols")
+		}
+	}
+
 	_, err := s.userRepository.GetByEmail(request.Email)
 	if err == nil || err.Error() != "record not found" {
 		return models.RegisterResponse{}, models.ErrUserDisabled{
