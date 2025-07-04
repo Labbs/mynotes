@@ -15,13 +15,17 @@ func NewDocumentRouter(config *Config, rbacMiddleware fiber.Handler) {
 	// initialize the document repository
 	dr := repository.NewDocumentRepository(config.Db)
 
+	// initialize the favorite repository with the database connection
+	fr := repository.NewFavoriteRepository(config.Db)
+
 	// initialize the user repository with the database connection
 	c := controller.DocumentController{
 		DocumentService: service.NewDocumentService(dr),
+		FavoriteService: service.NewFavoriteService(fr),
 		Logger:          config.Logger,
 	}
 
-	v1Document := config.Fiber.Group("/api/v1/document", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(repository.NewSessionRepository(config.Db))), rbacMiddleware)
+	v1Document := config.Fiber.Group(ApiV1Path+"/document", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(repository.NewSessionRepository(config.Db))), rbacMiddleware)
 	v1Document.Get("/space/:spaceId", c.GetDocumentsFromSpace)
 	v1Document.Get("/parent/:documentId", c.GetDocumentsFromParentDocument)
 	v1Document.Get("/slug/:slug", c.GetDocumentBySlug)
