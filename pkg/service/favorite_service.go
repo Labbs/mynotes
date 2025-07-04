@@ -29,3 +29,7 @@ func (s *favoriteService) UnFavorite(userId string, documentId string) error {
 func (s *favoriteService) DeleteFavorite(id string) error {
 	return s.favoriteRepository.DeleteFavorite(id)
 }
+
+func (s *favoriteService) DeleteFavoritesByDocumentId(documentId string) error {
+	return s.favoriteRepository.DeleteFavoritesByDocumentId(documentId)
+}
