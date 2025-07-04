@@ -38,3 +38,7 @@ func (r *favoriteRepository) UnFavorite(userId string, documentId string) error 
 func (r *favoriteRepository) DeleteFavorite(id string) error {
 	return r.db.Where("id = ?", id).Delete(&models.Favorite{}).Error
 }
+
+func (r *favoriteRepository) DeleteFavoritesByDocumentId(documentId string) error {
+	return r.db.Debug().Where("document_id = ?", documentId).Delete(&models.Favorite{}).Error
+}
