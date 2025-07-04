@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gosimple/slug"
 	"github.com/labbs/zotion/internal/shortuuid"
@@ -10,6 +12,7 @@ import (
 
 type DocumentController struct {
 	DocumentService models.DocumentService
+	FavoriteService models.FavoriteService
 	Logger          zerolog.Logger
 }
 
@@ -22,7 +25,7 @@ type DocumentController struct {
 // @Param spaceId path string true "Space Id"
 // @Success 200 {array} models.Document
 // @Failure 500 {object} models.ErrorResponse
-// @Router /api/document/space/{spaceId} [get]
+// @Router /api/v1/document/space/{spaceId} [get]
 func (dc *DocumentController) GetDocumentsFromSpace(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
@@ -47,18 +50,18 @@ func (dc *DocumentController) GetDocumentsFromSpace(ctx *fiber.Ctx) error {
 // @Param documentId path string true "Document Id"
 // @Success 200 {array} models.Document
 // @Failure 500 {object} models.ErrorResponse
+// @Router /api/v1/document/{spaceId}/{documentId} [get]
 func (dc *DocumentController) GetDocumentsFromParentDocument(ctx *fiber.Ctx) error {
 	logger := dc.Logger.With().Str("event", "api.documents.get").Logger()
 
-	spaceId := ctx.Params("spaceId")
 	documentId := ctx.Params("documentId")
-	documents, err := dc.DocumentService.GetDocumentsFirstLevelByDocumentId(spaceId, documentId)
+	documents, err := dc.DocumentService.GetDocumentsFirstLevelByDocumentId(documentId)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting documents from parent document")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
 	}
 
-	logger.Debug().Str("space", spaceId).Str("document", documentId).Msg("Documents retrieved successfully")
+	logger.Debug().Str("document", documentId).Msg("Documents retrieved successfully")
 	return ctx.Status(fiber.StatusOK).JSON(documents)
 }
 
@@ -180,6 +183,7 @@ func (dc *DocumentController) UpdateDocument(ctx *fiber.Ctx) error {
 
 	document.Content = documentRequest.Content
 	document.Config = documentRequest.Config
+	document.Public = documentRequest.Public
 
 	document, err = dc.DocumentService.UpdateDocument(document)
 	if err != nil {
@@ -210,6 +214,16 @@ func (dc *DocumentController) DeleteDocument(ctx *fiber.Ctx) error {
 		logger.Error().Err(err).Msg("Error deleting document")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
 	}
+
+	fmt.Println("Document deleted successfully")
+
+	err = dc.FavoriteService.DeleteFavoritesByDocumentId(documentId)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error deleting favorites")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	fmt.Println("Favorites deleted successfully")
 
 	logger.Debug().Str("document", documentId).Msg("Document deleted successfully")
 	return ctx.SendStatus(fiber.StatusNoContent)

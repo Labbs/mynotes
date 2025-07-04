@@ -36,6 +36,7 @@ type FavoriteRepository interface {
 	DeleteFavorite(id string) error
 	IsFavorite(userId string, documentId string) (bool, error)
 	UnFavorite(userId string, documentId string) error
+	DeleteFavoritesByDocumentId(documentId string) error
 }
 
 type FavoriteService interface {
@@ -44,4 +45,5 @@ type FavoriteService interface {
 	DeleteFavorite(id string) error
 	IsFavorite(userId string, documentId string) (bool, error)
 	UnFavorite(userId string, documentId string) error
+	DeleteFavoritesByDocumentId(documentId string) error
 }

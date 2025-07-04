@@ -27,8 +27,10 @@ func upDocument(ctx context.Context, tx *sql.Tx) error {
 			metadata JSONB,
 			parent_id TEXT,
 			properties JSONB,
+			members JSONB,
 			space_id TEXT,
 			content TEXT,
+			public bool NOT NULL DEFAULT false,
 			created_at datetime NOT NULL,
 			updated_at datetime NOT NULL,
 			deleted_at datetime
@@ -49,8 +51,10 @@ func upDocument(ctx context.Context, tx *sql.Tx) error {
 			metadata jsonb,
 			parent_id varchar,
 			properties jsonb,
+			members jsonb,
 			space_id varchar,
 			content text,
+			public boolean NOT NULL DEFAULT false,
 			created_at timestamp NOT NULL,
 			updated_at timestamp NOT NULL,
 			deleted_at timestamp

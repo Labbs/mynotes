@@ -22,7 +22,7 @@ func NewInstance() *cli.Command {
 		Name:   "migration",
 		Usage:  "Run Alfred migrations",
 		Flags:  migrationFlags,
-		Before: altsrc.InitInputSourceWithContext(migrationFlags, altsrc.NewJSONSourceFromFlagFunc("config")),
+		Before: altsrc.InitInputSourceWithContext(migrationFlags, altsrc.NewYamlSourceFromFlagFunc("config")),
 		Action: runMigration,
 	}
 }

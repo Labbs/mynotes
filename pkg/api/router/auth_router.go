@@ -1,13 +1,14 @@
 package router
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/labbs/zotion/pkg/api/controller"
 	"github.com/labbs/zotion/pkg/api/middleware"
 	"github.com/labbs/zotion/pkg/repository"
 	"github.com/labbs/zotion/pkg/service"
 )
 
-func NewAuthRouter(config *Config) {
+func NewAuthRouter(config *Config, rbacMiddleware fiber.Handler) {
 	// Set up the auth routes
 	config.Logger.Info().Msg("Setting up auth routes")
 
@@ -32,7 +33,7 @@ func NewAuthRouter(config *Config) {
 
 	// Set up the auth routes
 	// create a new group for the auth routes
-	auth := config.Fiber.Group("/api/auth")
+	auth := config.Fiber.Group(ApiV1Path + "/auth")
 	auth.Post("/login", c.Login)
 	auth.Post("/register", c.Register)
 
@@ -42,7 +43,7 @@ func NewAuthRouter(config *Config) {
 	// to all routes in this group
 	// this is used to protect the logout route
 	// and require the user to be authenticated
-	authPrivate := config.Fiber.Group("/api/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), middleware.RBACCheckMiddleware(config.Logger))
+	authPrivate := config.Fiber.Group(ApiV1Path+"/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), rbacMiddleware)
 	authPrivate.Post("/logout", c.Logout)
 	authPrivate.Get("/validate", c.ValidateSession)
 }

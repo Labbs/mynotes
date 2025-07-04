@@ -1,13 +1,12 @@
 package models
 
 import (
-	"database/sql/driver"
 	"time"
 
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gosimple/slug"
 	"github.com/labbs/zotion/internal/shortuuid"
+	"github.com/labbs/zotion/pkg/caching"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +23,9 @@ type Space struct {
 	Documents []Document `json:"documents"`
 
 	Members Members `json:"members"`
+
+	// MembersWithUsers is used to return the members with user information
+	MembersWithUsersOrGroups MembersWithUsersOrGroups `json:"members_with_users_or_groups" gorm:"-"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -51,6 +53,23 @@ func (s *Space) BeforeUpdate(tx *gorm.DB) error {
 	return nil
 }
 
+func (s *Space) AfterCreate(tx *gorm.DB) error {
+	caching.Cache.Set("space:"+s.Id, s.Members)
+	return nil
+}
+
+func (s *Space) AfterUpdate(tx *gorm.DB) error {
+	caching.Cache.Set("space:"+s.Id, s.Members)
+	return nil
+}
+
+// AfterDelete is a hook that runs after deleting a space
+func (s *Space) AfterDelete(tx *gorm.DB) error {
+	// Remove the space from the cache
+	caching.Cache.Delete("space:" + s.Id)
+	return nil
+}
+
 // SpaceType is the type of space
 type SpaceType string
 
@@ -63,50 +82,13 @@ const (
 	SpaceTypeRestricted SpaceType = "restricted"
 )
 
-// MemberType is the type of member
-type MemberType string
-
-// AccessType is the access type of a member
-type AccessType string
-
-type Members []Member
-
-func (m Members) Value() (driver.Value, error) {
-	valueString, err := json.Marshal(m)
-	return string(valueString), err
-}
-
-func (m *Members) Scan(value any) error {
-	return json.Unmarshal([]byte(value.(string)), m)
-}
-
-// Member is a model for a member
-type Member struct {
-	Id     string     `json:"id"`
-	Type   MemberType `json:"type"`
-	Access AccessType `json:"access"`
-}
-
-// AccessTypeViewer is the access type viewer
-const (
-	AccessTypeViewer  AccessType = "viewer"
-	AccessTypeEditor  AccessType = "editor"
-	AccessTypeComment AccessType = "comment"
-	AccessTypeFull    AccessType = "full"
-)
-
-// MemberType is the type of member
-const (
-	MemberTypeUser  MemberType = "user"
-	MemberTypeGroup MemberType = "group"
-)
-
 // SpaceRepository is the repository for spaces
 type SpaceRepository interface {
 	GetSpacesForUser(userId string, groups []Group) ([]Space, error)
 	GetSpaceById(spaceId string) (Space, error)
 	CreateSpace(space Space) (Space, error)
 	IsMember(spaceId, userId string) (bool, error)
+	GetAllSpaces() ([]Space, error)
 }
 
 // SpaceService is the service for spaces
@@ -115,4 +97,5 @@ type SpaceService interface {
 	GetSpaceById(spaceId string) (Space, error)
 	CreateSpace(space Space) (Space, error)
 	IsMember(spaceId, userId string) (bool, error)
+	GetAllSpaces() ([]Space, error)
 }

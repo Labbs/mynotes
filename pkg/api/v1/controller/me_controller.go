@@ -27,7 +27,7 @@ func (mc *MeController) GetMySpaces(ctx *fiber.Ctx) error {
 	logger := mc.Logger.With().Str("event", "api.spaces.get").Logger()
 
 	userId := ctx.Locals("user_id").(string)
-	groups, err := mc.UserService.GetGroups(userId)
+	groups, err := mc.UserService.GetGroupsByUserId(userId)
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting user groups")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
@@ -60,6 +60,13 @@ func (mc *MeController) GetMyProfile(ctx *fiber.Ctx) error {
 	if err != nil {
 		logger.Error().Err(err).Msg("Error getting user profile")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	// check if is_admin is set in context
+	if ctx.Locals("is_admin") != nil {
+		if ctx.Locals("is_admin").(bool) {
+			user.IsAdmin = true
+		}
 	}
 
 	user.Password = ""
@@ -158,4 +165,90 @@ func (mc *MeController) UnFavorite(ctx *fiber.Ctx) error {
 
 	logger.Debug().Str("user", userId).Msg("User favorite removed successfully")
 	return ctx.Status(fiber.StatusOK).JSON(favorites)
+}
+
+// GetMyPreferences godoc
+// @Summary Get my preferences
+// @Description Get my preferences
+// @Tags me
+// @Accept json
+// @Produce json
+// @Param userId path string true "User Id"
+// @Success 200 {object} models.JSONB
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/me/preferences [get]
+func (mc *MeController) GetMyPreferences(ctx *fiber.Ctx) error {
+	logger := mc.Logger.With().Str("event", "api.me.get_preferences").Logger()
+
+	userId := ctx.Locals("user_id").(string)
+	preferences, err := mc.UserService.GetPreferencesById(userId)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error getting user preferences")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	logger.Debug().Str("user", userId).Msg("User preferences retrieved successfully")
+	return ctx.Status(fiber.StatusOK).JSON(preferences)
+}
+
+// UpdateMyPreferences godoc
+// @Summary Update my preferences
+// @Description Update my preferences
+// @Tags me
+// @Accept json
+// @Produce json
+// @Param userId path string true "User Id"
+// @Param preferences body models.JSONB true "Preferences"
+// @Success 200 {object} models.JSONB
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/me/preferences [put]
+func (mc *MeController) UpdateMyPreferences(ctx *fiber.Ctx) error {
+	logger := mc.Logger.With().Str("event", "api.me.update_preferences").Logger()
+
+	userId := ctx.Locals("user_id").(string)
+	var preferences models.JSONB
+
+	if err := ctx.BodyParser(&preferences); err != nil {
+		logger.Error().Err(err).Msg("Error parsing preferences")
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := mc.UserService.UpdatePreferences(userId, preferences); err != nil {
+		logger.Error().Err(err).Msg("Error updating user preferences")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	logger.Debug().Str("user", userId).Msg("User preferences updated successfully")
+	return ctx.Status(fiber.StatusOK).JSON(preferences)
+}
+
+// ChangeMyPassword godoc
+// @Summary Change my password
+// @Description Change my password
+// @Tags me
+// @Accept json
+// @Produce json
+// @Param userId path string true "User Id"
+// @Param password body models.JSONB true "Password"
+// @Success 200 {object} models.JSONB
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/me/password [put]
+func (mc *MeController) ChangeMyPassword(ctx *fiber.Ctx) error {
+	logger := mc.Logger.With().Str("event", "api.me.change_password").Logger()
+
+	userId := ctx.Locals("user_id").(string)
+	var request models.ChangePasswordRequest
+
+	if err := ctx.BodyParser(&request); err != nil {
+		logger.Error().Err(err).Msg("Error parsing password")
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := mc.UserService.ChangePassword(userId, request.CurrentPassword, request.NewPassword); err != nil {
+		logger.Error().Err(err).Msg("Error changing user password")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	logger.Debug().Str("user", userId).Msg("User password changed successfully")
+	return ctx.SendStatus(fiber.StatusOK)
 }

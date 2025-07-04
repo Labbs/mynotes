@@ -21,6 +21,8 @@ type User struct {
 
 	Groups []Group `json:"groups" gorm:"many2many:user_group;"`
 
+	IsAdmin bool `json:"is_admin,omitempty" gorm:"-"`
+
 	Favorites []Favorite `json:"favorites"`
 
 	CreatedAt time.Time `json:"created_at"`
@@ -40,15 +42,27 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// ChangePasswordRequest
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"current_password"`
+	NewPassword     string `json:"new_password"`
+}
+
 // UserRepository defines the methods that a user repository should implement.
 type UserRepository interface {
 	GetByEmailOrUsername(emailOrUsername string) (User, error)
 	GetByEmail(email string) (User, error)
 	GetById(id string) (User, error)
+	GetPreferencesById(id string) (JSONB, error)
+	UpdatePreferences(id string, preferences JSONB) error
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
-	GetGroups(userId string) ([]Group, error)
+	GetGroupsByUserId(userId string) ([]Group, error)
+	GetAllUsers() ([]User, error)
+	GetAllInactiveUsers() ([]User, error)
+	GetUserWithGroups(id string) (User, error)
+	GetUsersWithGroups() ([]User, error)
 }
 
 // UserService defines the methods that a user service should implement.
@@ -56,8 +70,15 @@ type UserService interface {
 	GetByEmailOrUsername(emailOrUsername string) (User, error)
 	GetByEmail(email string) (User, error)
 	GetById(id string) (User, error)
+	GetPreferencesById(id string) (JSONB, error)
 	Create(user *User) error
 	Update(user *User) (User, error)
 	Delete(id string) error
-	GetGroups(userId string) ([]Group, error)
+	GetGroupsByUserId(userId string) ([]Group, error)
+	GetAllUsers() ([]User, error)
+	GetAllInactiveUsers() ([]User, error)
+	UpdatePreferences(id string, preferences JSONB) error
+	GetUserWithGroups(id string) (User, error)
+	GetUsersWithGroups() ([]User, error)
+	ChangePassword(userId string, currentPassword string, newPassword string) error
 }

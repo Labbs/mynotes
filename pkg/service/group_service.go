@@ -23,7 +23,7 @@ func (s *groupService) GetGroupById(id string) (models.Group, error) {
 
 // GetGroupWithUsers returns a group with users
 func (s *groupService) GetGroupWithUsers(id string) (models.Group, error) {
-	return s.groupRepository.GetWithUsers(id)
+	return s.groupRepository.GetGroupWithUsers(id)
 }
 
 // GetAllGroups returns all groups
@@ -39,4 +39,9 @@ func (s *groupService) UpdateGroup(group models.Group) (models.Group, error) {
 // DeleteGroup deletes a group
 func (s *groupService) DeleteGroup(id string) error {
 	return s.groupRepository.Delete(id)
+}
+
+// GetAllGroupsWithUsers returns all groups with users
+func (s *groupService) GetAllGroupsWithUsers() ([]models.Group, error) {
+	return s.groupRepository.GetAllGroupsWithUsers()
 }
