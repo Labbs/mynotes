@@ -33,7 +33,7 @@ func NewMeRouter(config *Config, rbacMiddleware fiber.Handler) {
 		Logger:          config.Logger,
 	}
 
-	v1Me := config.Fiber.Group("/api/v1/me", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(repository.NewSessionRepository(config.Db))), rbacMiddleware)
+	v1Me := config.Fiber.Group(ApiV1Path+"/me", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(repository.NewSessionRepository(config.Db))), rbacMiddleware)
 	v1Me.Get("/profile", c.GetMyProfile)
 	v1Me.Get("/favorites", c.GetMyFavorites)
 	v1Me.Get("/spaces", c.GetMySpaces)
@@ -41,4 +41,5 @@ func NewMeRouter(config *Config, rbacMiddleware fiber.Handler) {
 	v1Me.Delete("/favorites/:documentId", c.UnFavorite)
 	v1Me.Get("/preferences", c.GetMyPreferences)
 	v1Me.Put("/preferences", c.UpdateMyPreferences)
+	v1Me.Put("/change-password", c.ChangeMyPassword)
 }
