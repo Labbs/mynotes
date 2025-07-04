@@ -221,3 +221,34 @@ func (mc *MeController) UpdateMyPreferences(ctx *fiber.Ctx) error {
 	logger.Debug().Str("user", userId).Msg("User preferences updated successfully")
 	return ctx.Status(fiber.StatusOK).JSON(preferences)
 }
+
+// ChangeMyPassword godoc
+// @Summary Change my password
+// @Description Change my password
+// @Tags me
+// @Accept json
+// @Produce json
+// @Param userId path string true "User Id"
+// @Param password body models.JSONB true "Password"
+// @Success 200 {object} models.JSONB
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/me/password [put]
+func (mc *MeController) ChangeMyPassword(ctx *fiber.Ctx) error {
+	logger := mc.Logger.With().Str("event", "api.me.change_password").Logger()
+
+	userId := ctx.Locals("user_id").(string)
+	var request models.ChangePasswordRequest
+
+	if err := ctx.BodyParser(&request); err != nil {
+		logger.Error().Err(err).Msg("Error parsing password")
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := mc.UserService.ChangePassword(userId, request.CurrentPassword, request.NewPassword); err != nil {
+		logger.Error().Err(err).Msg("Error changing user password")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal server error"})
+	}
+
+	logger.Debug().Str("user", userId).Msg("User password changed successfully")
+	return ctx.SendStatus(fiber.StatusOK)
+}
