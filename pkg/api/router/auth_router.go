@@ -33,7 +33,7 @@ func NewAuthRouter(config *Config, rbacMiddleware fiber.Handler) {
 
 	// Set up the auth routes
 	// create a new group for the auth routes
-	auth := config.Fiber.Group("/api/auth")
+	auth := config.Fiber.Group(ApiV1Path + "/auth")
 	auth.Post("/login", c.Login)
 	auth.Post("/register", c.Register)
 
@@ -43,7 +43,7 @@ func NewAuthRouter(config *Config, rbacMiddleware fiber.Handler) {
 	// to all routes in this group
 	// this is used to protect the logout route
 	// and require the user to be authenticated
-	authPrivate := config.Fiber.Group("/api/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), rbacMiddleware)
+	authPrivate := config.Fiber.Group(ApiV1Path+"/auth", middleware.JwtAuthMiddleware(config.Logger, service.NewSessionService(sr)), rbacMiddleware)
 	authPrivate.Post("/logout", c.Logout)
 	authPrivate.Get("/validate", c.ValidateSession)
 }
