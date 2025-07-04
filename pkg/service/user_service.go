@@ -1,6 +1,9 @@
 package service
 
-import "github.com/labbs/zotion/pkg/models"
+import (
+	"github.com/labbs/zotion/pkg/models"
+	"golang.org/x/crypto/bcrypt"
+)
 
 type userService struct {
 	userRepository models.UserRepository
@@ -62,4 +65,27 @@ func (s *userService) GetUserWithGroups(id string) (models.User, error) {
 
 func (s *userService) GetUsersWithGroups() ([]models.User, error) {
 	return s.userRepository.GetUsersWithGroups()
+}
+
+func (s *userService) ChangePassword(userId string, currentPassword string, newPassword string) error {
+	user, err := s.userRepository.GetById(userId)
+	if err != nil {
+		return err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword))
+	if err != nil {
+		return err
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(hashedPassword)
+
+	_, err = s.userRepository.Update(&user)
+
+	return err
 }
