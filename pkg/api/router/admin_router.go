@@ -26,7 +26,7 @@ func NewAdminRouter(config *Config, rbacMiddleware fiber.Handler) {
 		Logger:          config.Logger,
 	}
 
-	v1Admin := config.Fiber.Group("/api/v1/admin", rbacMiddleware)
+	v1Admin := config.Fiber.Group(ApiV1Path+"/admin", rbacMiddleware)
 	v1Admin.Get("/users", c.GetUsers)
 	v1Admin.Get("/groups", c.GetGroups)
 	v1Admin.Get("/spaces", c.GetSpaces)
