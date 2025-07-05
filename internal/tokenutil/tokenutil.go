@@ -106,5 +106,5 @@ func IsPasswordComplex(password string) bool {
 
 // IsSessionExpired checks if the session has expired based on the configured expiration time.
 func IsSessionExpired(expire time.Time) bool {
-	return expire.Before(time.Now().Add(time.Second * time.Duration(config.Session.Expire)))
+	return expire.Before(time.Now())
 }
