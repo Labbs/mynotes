@@ -99,3 +99,7 @@ type SpaceService interface {
 	IsMember(spaceId, userId string) (bool, error)
 	GetAllSpaces() ([]Space, error)
 }
+
+type CreateSpaceRequest struct {
+	Name string `json:"name"`
+}
