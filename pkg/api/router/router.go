@@ -34,4 +34,5 @@ func (c *Config) Setup() {
 	NewDocumentRouter(c, crbac.Check())
 	NewAdminRouter(c, crbac.Check())
 	NewPublicRouter(c, crbac.Check())
+	NewSpaceRouter(c, crbac.Check())
 }
