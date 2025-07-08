@@ -38,7 +38,7 @@ jobs:
       with:
         prefix: 'v'
 
-    - name: build ui
+    - name: Build ui
       run: |
         cd ui
         npm install
