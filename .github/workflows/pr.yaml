@@ -41,6 +41,7 @@ jobs:
     - name: build ui
       run: |
         cd ui
+        npm install
         node_modules/.bin/vite build --outDir ../pkg/app/static/files
 
     - name: Build app
