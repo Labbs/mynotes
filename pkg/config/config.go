@@ -42,6 +42,10 @@ var (
 		Enable bool // Enable or disable caching
 	}
 
+	Auth struct {
+		DisableAdminAccount bool
+	}
+
 	Registration struct {
 		Enabled                  bool            // Enable or disable user registration
 		RequireEmailVerification bool            // Require email verification for new registrations

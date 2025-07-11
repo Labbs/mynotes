@@ -50,5 +50,13 @@ func RegistrationFlags() []cli.Flag {
 			Value:       true,
 			Destination: &config.Registration.PasswordComplexity,
 		}),
+		altsrc.NewBoolFlag(&cli.BoolFlag{
+			Name:        "auth.disable-admin-account",
+			Aliases:     []string{"ada"},
+			EnvVars:     []string{"AUTH_DISABLE_ADMIN_ACCOUNT"},
+			Usage:       "Disable admin account",
+			Value:       false,
+			Destination: &config.Auth.DisableAdminAccount,
+		}),
 	}
 }
