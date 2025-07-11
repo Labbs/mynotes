@@ -45,4 +45,4 @@ jobs:
         node_modules/.bin/vite build --outDir ../pkg/app/static/files
 
     - name: Build app
-      run: CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflags="-X 'main.version=${{ steps.version.outputs.full }}'" -o bin/app cmd/cmd.go
+      run: CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static" -X "main.version=${{ steps.version.outputs.full }}"' -o bin/app cmd/cmd.go
