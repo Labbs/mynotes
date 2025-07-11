@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/labbs/zotion/internal/auth"
 	"github.com/labbs/zotion/internal/database"
 	"github.com/labbs/zotion/pkg/caching"
 	"github.com/labbs/zotion/pkg/config"
@@ -65,6 +66,10 @@ func runServer(c *cli.Context) error {
 	httpServer.Logger = l
 	httpServer.Stop = stopChan
 	httpServer.Db = db
+
+	if err := auth.DisableAdminAccount(db); err != nil {
+		l.Error().Err(err).Msg("failed to disable/enable admin account")
+	}
 
 	httpServer.NewServer()
 

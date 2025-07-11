@@ -33,6 +33,9 @@ session:
   issuer: "zotion" # Issuer for JWT tokens
   expire: 604800 # 7 days in seconds
 
+auth:
+  disable-admin-account: false
+
 # Registration settings
 registration:
   enabled: true
